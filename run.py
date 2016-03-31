@@ -11,4 +11,4 @@ def connect():
     return 'Do some stuff to meter the VMs!'
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')

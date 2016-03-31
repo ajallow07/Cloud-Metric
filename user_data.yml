@@ -8,17 +8,13 @@ runcmd:
     # Update the source list
     - sudo apt-get update
 
-    - sudo apt-get install python-software-properties
-    - sudo add-apt-repository ppa:webupd8team/java
 
-    # Install Sun Java 6 JDK
-    - sudo apt-get install default-jdk
 
-    # Select Sun's Java as the default on your machine.
-    #   See 'sudo update-alternatives --config java' for more information.
-    - sudo update-java-alternatives -s java-6-sun
 
-    # adds dedicated hadoop user and group
-    - sudo addgroup hadoop
 
-    - sudo adduser --ingroup hadoop hduser
+
+
+
+
+
+
