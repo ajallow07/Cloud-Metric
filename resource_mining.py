@@ -13,6 +13,7 @@ import os
 import json
 
 NODE = platform.uname()[1]
+OS = platform.system()
 vCPU_COUNT = psutil.cpu_count()
 MEMORY_SIZE = 0
 DISK_SIZE = 0
@@ -63,10 +64,10 @@ def get_block_storage():
     return disk_size
 """
 Returns a json for each machine:
-{ machine: name
+{ machine: name,
     specs: {
-        cpu:
-        memory:
+        cpu:,
+        memory:,
         disk:
     }
 }
@@ -96,10 +97,9 @@ def main():
     MEMORY_SIZE = get_total_memory(psutil.virtual_memory())
     DISK_SIZE = get_block_storage()
     vCPU_COUNT = detect_ncpus()
-    values = {'node': NODE, 'resources': {'cpu': vCPU_COUNT, 'memory': MEMORY_SIZE, 'disk': DISK_SIZE},
-                'date': datetime.datetime.utcnow()}
+    values = {'node': NODE, 'os': OS, 'cpu': vCPU_COUNT, 'memory': MEMORY_SIZE, 'disk': DISK_SIZE}
     #print vCPU_COUNT
-    print values
+    #print values
     #Connect to MongoDB
 
     try:
@@ -110,7 +110,7 @@ def main():
         obj_id = result.inserted_id
         #print obj_id
     except Exception as e:
-        #print "Could not insert data to db: "+str(e)
+        print "Could not insert data to db: "+str(e)
 
 """
     cursor = db.machines.find()
