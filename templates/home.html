@@ -1,0 +1,30 @@
+{% extends "index.html" %}
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="{{url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+
+<script type=text/javascript>
+$SCRIPT_ROOT = {{request.script_root|tojson|safe }};
+</script>
+<script type=text/javascript>
+  $(function() {
+    $("#submitBtn").click(function() {
+      alert("Jello! I am working!")
+      $.getJSON(
+         $SCRIPT_ROOT + "/showInstanceDetails",
+         function(data) {
+             $('#result').text(data.result);
+         }
+      );
+    });
+  });
+</script>
+{% block content %}
+  <div class="jumbo">
+    <h2>Number of Nodes in your environment: {{vm}}<h2>
+    {% if vm > 0 %}
+      <strong> <a id="submitBtn" href="showInstanceDetails" style="text-decoration: none">show nodes</a></strong>
+    {% endif %}
+    <span id="result"> </span>
+  </div>
+
+{% endblock %}
