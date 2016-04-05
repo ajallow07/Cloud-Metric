@@ -1,4 +1,8 @@
 {% extends "index.html" %}
 {% block instanceDetails %}
-
+    {% if data %}
+    {% for key in data %}
+      <strong>{{key}}</strong>
+    {% endfor %}
+  {% endif %}
 {% endblock %}
