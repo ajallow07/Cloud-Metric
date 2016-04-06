@@ -1,16 +1,10 @@
 {% extends "index.html" %}
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="{{url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
 {% block content %}
   <div class="jumbo">
     <h3>Number of Nodes in your environment: {{vm}}<h3>
     {% if vm > 0 %}
-       {% for i in range(1, vm+1) %}
-          <div class="grid"+str(i)>
-              <span>Node {{i}} </span>
-
-          </div>
-       {% endfor %}
+      <strong> <a href="nodes">show nodes</a></strong>
     {% endif %}
-     </div>
-   {% endblock %}
+  </div>
+
+{% endblock %}

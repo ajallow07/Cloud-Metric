@@ -14,14 +14,14 @@ import json
 
 NODE = platform.uname()[1]
 OS = platform.system()
-vCPU_COUNT = psutil.cpu_count()
+vCPU_COUNT = 0
 MEMORY_SIZE = 0
 DISK_SIZE = 0
 
 """
 Retrieve memmory information
 """
-def bytes2human(n):
+def bytes_to_human(n):
     # >>> bytes2human(10000)
     # '9.8K'
     # >>> bytes2human(100001221)
@@ -42,7 +42,7 @@ def get_total_memory(nt):
     for name in nt._fields:
         value = getattr(nt, name)
         if name == 'total':
-            memory = bytes2human(value)
+            memory = bytes_to_human(value)
     return memory
 
 
@@ -60,7 +60,7 @@ def get_block_storage():
                 # partition or just hang.
                 continue
         usage = psutil.disk_usage(part.mountpoint)
-        disk_size = bytes2human(usage.total)
+        disk_size = bytes_to_human(usage.total)
     return disk_size
 """
 Returns a json for each machine:
@@ -92,7 +92,7 @@ def detect_ncpus():
         #return the default value
         return 1
 
-def main():
+def insert_data():
 #   returns a json object
     MEMORY_SIZE = get_total_memory(psutil.virtual_memory())
     DISK_SIZE = get_block_storage()
@@ -120,4 +120,4 @@ def main():
 """
 
 if __name__=='__main__':
-    main()
+    insert_data()

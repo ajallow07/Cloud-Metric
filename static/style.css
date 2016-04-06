@@ -1,6 +1,4 @@
 @charset "utf-8";
-
-
 /*******
 Abd-al-ala  Camara styles
 Base Rules and Typo ******/
@@ -36,178 +34,20 @@ html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
 }
-body {/* Improve default text rendering, handling of kerning pairs and ligatures */
-    -webkit-font-smoothing:antialiased;
-    font-smoothing:antialiased;
-    text-rendering:optimizeLegibility;
-}
-
-body, button, input, select, textarea {
-    color:  #444;
-    font-family: Georgia, Verdana, Helvetica, Arial, sans-serif;
-    font-size: 1em;
-    line-height: 1.5em;
-}
-
-h2, h3, h4, h5, h6,
-ol, dl, p, blockquote       { padding: 2.2% 0; }
-
-h1, h2, h3, h4, h5, h6      { font-family: Arial, Helvetica, "DejaVu Sans", "Liberation sans", "Bitstream Vera Sans", sans-serif; color: #000; font-weight: bold; margin: 0; text-rendering: optimizelegibility; }
-h1          {font-size: 2.25em; line-height: 1.3333333333333333333333333333333em; }
-h2          {font-size: 1.5em; line-height: 1em; }
-h3          {font-size: 1.3125em; line-height: 1.1428571428571428571428571428571em; }
-h4          {font-size: 1.125em; }
-h5          {font-size: 1em;}
-h6          {color: #999999; font-size: 1em; text-transform: uppercase;}
-h4, h5, h6  { line-height: 1.3333333333333333333333333333333em; }
-
-h1 small, h2 small, h3 small, h4 small, h5 small, h6 small { color: #999999; font-weight: normal; font-size: 0.875em;}
-small, p.small {margin: 0; font-size: 0.875em; line-height: 1.7142857142857142857142857142857em; margin-bottom: 1.7142857142857142857142857142857em;} /* 14px / 24px */
 
 
-/* ABBREVIATION/MARKED/INSERTED/DELETED AND SELECTED TEXT */
-abbr[title], dfn[title] {border-bottom: 1px dotted #333; cursor: help}
-abbr, acronym           { text-transform: uppercase; font-size: 90%; color: #222; border-bottom: 1px dotted #ddd; cursor: help; }
-
-ins, mark           {text-decoration: none}
-ins                 { background-color: #f3f5f6;  color: #000000;  }
-mark                { background-color: #f3f5f6;  color: #000000;  font-style: italic;  font-weight: bold;}
-del                 {text-decoration: line-through}
-::-moz-selection    {background: #c47529; color: #fff; text-shadow: none} /* selected text */
-::selection         {background: #c47529; color: #fff; text-shadow: none} /* selected text */
-
-
-/* OTHERS */
-strong, b, dt       {font-weight: bold}
-dfn                 {font-style: italic}
-em                  {font-style: italic; }
-var, address        {font-style: normal}
-sub, sup            {font-size: 75%; line-height: 0; position: relative; vertical-align: baseline} /* Position 'sub' and 'sup' without affecting line-height */
-sup                 {top: -0.5em} /* Move superscripted text up */
-sub                 {bottom: -0.25em} /* Move subscripted text down */
-span.amp            {font-family:Adobe Caslon Pro,Baskerville,"Goudy Old Style","Palatino","Palatino Linotype","Book Antiqua",Georgia,"Times New Roman",Times,serif;font-style:italic;font-size:110%;line-height:0;position:relative;vertical-align:baseline} /* Best available ampersand */
-
-
-/* code */
-pre {white-space: pre; white-space: pre-wrap; word-wrap: break-word} /* Allow line wrapping of 'pre' */
-pre, code, kbd, samp {font-size: .9em; line-height: 1.5em; margin-bottom: 1.5em; font-family: Monaco, Courier New, monospace; }
-
-
-
-/*  hyperLinks  */
-a {text-decoration: none; color: #006cb6;}
-a:hover {text-decoration: underline; color: #a0ce67;}
-a:focus {outline: thin dotted; color: #ccc;}
-a:hover, a:active {outline: none} /* Better CSS Outline Suppression */
-
-
-
-
-/* media */
-figure {margin: 0}
-img, object, embed, video {max-width: 100%; _width: 100%} /* Fluid images */
-img {height: auto; border: 0;   -ms-interpolation-mode: bicubic} /* Improve IE's resizing of images */
-svg:not(:root) {overflow: hidden} /* Correct IE9 overflow */
-
-.media            { overflow:hidden; *overflow:visible; zoom:1; }
-.media .img       { float:left; margin: 1.5em 1.5em 0 0; }
-.media .img img   { display:block; }
-.media .imgExt    { float:right; margin-left: 1.5em; }
-img               { border: 0; max-width: 100%; height: auto; }
-
-
-/* Lists  */
-ol, ul              { list-style: none; }
-.ol                 { list-style: decimal; margin: 0 1.5em }
-ul.square, .ol ,
-ul.circle, ul.disc  { margin: 0 1.5em  }
-ul.square li, .ol li ,
-ul.circle li, ul.disc li  { margin-bottom: 1em  }
-ul.square           { list-style: square outside; }
-ul.circle           { list-style: circle outside; }
-ul.disc             { list-style: disc outside; }
-
-/*  Tables  */
-table {border-collapse: collapse; border-spacing: 0; margin-bottom: 1.5em}
-table { background-color: transparent;
-                              border-collapse: collapse;
-                              border-spacing: 0;
-                              margin-bottom: 1.5em;
-                              max-width: 100%;
-                              width: 100%;
-                            }
-table th, table td   {
-                              font-size: 100%;
-                              line-height: 1.5em;
-                              padding:1.5%;
-                              text-align: left;
-                              vertical-align: top; }
-table colgroup + thead tr:first-child th,
-table colgroup + thead tr:first-child td,
-table thead:first-child tr:first-child th,
-table thead:first-child tr:first-child td { border-top: 0 none; }
-table thead th              { vertical-align: bottom; }
-table th                    { font-weight: bold; }
-table tbody + tbody         { border-top: 2px solid #ccc;}
-table tbody tr:hover td,
-table tbody tr:hover th     { background-color: #eee; }
-
-.bordered                   { border: 1px solid #ccc; border-collapse: separate; }
-.bordered th, .bordered td  { border-left: 1px solid #ccc; }
-.bordered thead:first-child tr:first-child th,
-.bordered tbody:first-child tr:first-child th,
-.bordered tbody:first-child tr:first-child td   { border-top: 0 none; }
-
-.striped tbody tr:nth-child(2n+1) td,
-.striped tbody tr:nth-child(2n+1) th            { background-color: #C7CED6; }
-
-
-.grid1, .grid2, .grid3, .grid4, .grid5, .grid6,
-.grid7, .grid8, .grid9, .grid10, .grid11, .grid12 {
-    display: inline;
-    float: left;
-    margin-right: 3.8%;
-}
-
-.grid1      { width: 4.85%; }
-.grid2      { width: 13.45%; }
-.grid3      { width: 22.05%; }
-.grid4      { width: 30.75%; }
-.grid5      { width: 39.45%; }
-.grid6      { width: 48%; }
-.grid7      { width: 56.75%; }
-.grid8      { width: 65.4%; }
-.grid9      { width: 74.05%; }
-.grid10     { width: 82.7%; }
-.grid11     { width: 91.35%; }
-.grid12     { width: 100%;float: left; }
-.lastgrid   { margin-right: 0px; border-right: 0 none;}
-
-.left{float: left;}
-.right{float: right;}
-.right img{height:20%; width:100%;}
-
-.container:after,
-.lastSect:after {
-  clear:both;
-  display:block;
-  visibility:hidden;
-  overflow:hidden;
-  height:0 !important;
-  line-height:0;
-  font-size:xx-large;
-  content:"x";}
-
-
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: #444;
-    }
-  /*
-  * Create dark grey header with a white logo
-  */
+body {
+  -webkit-font-smoothing:antialiased;
+  font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  margin: 0;
+  padding: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #444;
+  }
+/*
+* Create dark grey header with a white logo
+*/
   header {
     background-color: #2B2B2B;
     height: 35px;
@@ -229,32 +69,51 @@ table tbody tr:hover th     { background-color: #eee; }
   text-decoration: none;
   }
 
+.container table, th, tr, td {
+
+}
+
+.container table {
+  border: 5px solid red;
+  border-collapse: collapse;
+  border-radius: 8px;
+
+}
+
+.container th, td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+.container th {
+  background-color: #4CAF50;
+  color: white;
+}
   /*
   * Center the body content
   */
-
-  .container{
+.container {
   width:80%;
   margin:0 auto;
 }
 
-  div.jumbo {
-    font-size: 12px
-    padding: 10px 0 10px 0;
-    background-color: #eeeeee;
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
-    border-radius: 6px;
-  }
+.jumbo {
+  font-size: 12px
+  padding: 10px 0 10px 0;
+  background-color: #eeeeee;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+}
 
-  h2 {
+h2 {
   font-size: 3em;
   margin-top: 40px;
   text-align: center;
   letter-spacing: -2px;
-  }
+}
 
-  h3 {
+h3 {
   font-size: 1.7em;
   font-weight: 100;
   margin-top: 30px;

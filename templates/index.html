@@ -5,11 +5,11 @@
    <meta name="viewport" content="width=device-width, initial-scale=1">
    <meta name="description" content="">
    <meta name="author" content="">
-   <link rel="icon" href="../favicon.ico">
+   <link rel="icon" href="/static/img/cloud.ico">
   <meta charset="utf-8" name="Cloud-Metric" content="Cloud Cost Estimation, Cost Estimator,
   Cost Estimation on Google Cloud and Amazon AWS, Framwork for Cloud Cost Estimation, Cloud applications cost estimation">
   <title>CLOUD-METRIC: Cost Effective Applications Development Framework for Cloud Insfrastructures </title>
-  <strong><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" ></strong>
+  <strong><link rel="stylesheet" href="{{url_for('static', filename='style.css') }}" ></strong>
 </head>
 <body>
   <header>
@@ -18,20 +18,25 @@
         <strong><nav>
         <ul class="menu">
           <li><a href="{{ url_for('home') }}">Home</a></li>
-          <li><a href="{{ url_for('cost') }}">Cost</a></li>
+          <li><a href="{{ url_for('nodes') }}">Nodes</a></li>
+          <li><a href="{{ url_for('awscost') }}">Amazon AWS</a></li>
+          <li><a href="{{ url_for('gcecost') }}">Google Cloud</a></li>
         </ul>
     </nav></strong>
       </div>
   </header>
     <div class="container">
         {% block content %}
+
         {% endblock %}
     </div>
-    <div id="no" class="container">
+    <div class="container">
         {% block instanceDetails %}
 
         {% endblock %}
     </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="{{url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
 
     <footer class="ft ">
         <div class="container">

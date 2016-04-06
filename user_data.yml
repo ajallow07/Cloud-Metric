@@ -6,25 +6,13 @@ packages-upgrade: true
 
 runcmd:
     # Update the source list
+    - sudo apt-get upgrade
+
     - sudo apt-get update
+    - sudo apt-get install python
 
-    - sudo apt-get install python-software-properties
-    - sudo add-apt-repository ppa:webupd8team/java
+    - sudo apt-get install python-pip
 
-    # Install Sun Java 6 JDK
-    - sudo apt-get install default-jdk
+    - sudo pip install psutil
 
-    # Select Sun's Java as the default on your machine.
-    #   See 'sudo update-alternatives --config java' for more information.
-    - sudo update-java-alternatives -s java-6-sun
-
-    # adds dedicated hadoop user and group
-    - sudo addgroup hadoop
-
-    - sudo adduser --ingroup hadoop hduser
-
-    - su - hduser
-
-    - ssh-keygen -t rsa -P ""
-
-    - cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
+    - sudo pip install -U pymongo
