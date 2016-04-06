@@ -1,0 +1,36 @@
+{% extends "index.html" %}
+
+{% block instanceDetails %}
+
+ {% for machine in data %}
+  <table class="tab">
+  <tr>
+    <th>Parameter</th>
+    <th>Value</th>
+  <tr>
+  <tr>
+    <td>Node</td>
+    <td>{{machine['node']}}</td>
+  </tr>
+  <tr>
+    <td>OS</td>
+    <td>{{machine['os']}}</td>
+  </tr>
+  <tr>
+    <td>vCPU</td>
+    <td>{{machine['cpu']}}</td>
+
+  </tr>
+  <tr>
+    <td>Memory (GB)</td>
+    <td>{{machine['memory']}}</td>
+
+  </tr>
+  <tr>
+    <td>Storage (GB)</td>
+    <td>{{machine['disk']}}</td>
+  </tr>
+  </table>
+  {% endfor %}
+
+{% endblock %}
