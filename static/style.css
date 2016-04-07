@@ -72,22 +72,127 @@ body {
 .container table, th, tr, td {
 
 }
+.tableGenerator {
+  margin:0px;padding:0px;
+	width:100%;
+	border:1px solid #000000;
+
+	-moz-border-radius-bottomleft:12px;
+	-webkit-border-bottom-left-radius:12px;
+	border-bottom-left-radius:12px;
+
+	-moz-border-radius-bottomright:12px;
+	-webkit-border-bottom-right-radius:12px;
+	border-bottom-right-radius:12px;
+
+	-moz-border-radius-topright:12px;
+	-webkit-border-top-right-radius:12px;
+	border-top-right-radius:12px;
+
+	-moz-border-radius-topleft:12px;
+	-webkit-border-top-left-radius:12px;
+	border-top-left-radius:12px;
+}
 
 .container table {
-  border: 5px solid red;
+  margin-top:1%;
+  margin-right:15%
   border-collapse: collapse;
-  border-radius: 8px;
+  border-spacing: 0;
+	width:33.3%;
+  padding:5px;
+  float:left;
+	-moz-border-radius-bottomleft:12px;
+	-webkit-border-bottom-left-radius:12px;
+	border-bottom-left-radius:12px;
+
+	-moz-border-radius-bottomright:12px;
+	-webkit-border-bottom-right-radius:12px;
+	border-bottom-right-radius:12px;
+
+	-moz-border-radius-topright:12px;
+	-webkit-border-top-right-radius:12px;
+	border-top-right-radius:12px;
+
+	-moz-border-radius-topleft:12px;
+	-webkit-border-top-left-radius:12px;
+	border-top-left-radius:12px;
 
 }
 
-.container th, td {
-  padding: 8px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
+.container tr:last-child td:last-child {
+  -moz-border-radius-bottomright:14px;
+	-webkit-border-bottom-right-radius:14px;
+	border-bottom-right-radius:14px;
 }
-.container th {
-  background-color: #4CAF50;
-  color: white;
+
+.container table tr:first-child td:first-child {
+  -moz-border-radius-topleft:14px;
+	-webkit-border-top-left-radius:14px;
+	border-top-left-radius:14px;
+}
+.container table tr:first-child td:last-child {
+	-moz-border-radius-topright:12px;
+	-webkit-border-top-right-radius:12px;
+	border-top-right-radius:12px;
+
+}.container tr:last-child td:first-child{
+  -moz-border-radius-bottomleft:14px;
+	-webkit-border-bottom-left-radius:14px;
+	border-bottom-left-radius:14px;
+}.container tr:hover td{
+	background-color:#ffffff;
+
+
+}
+.container td{
+	vertical-align:middle;
+	background-color:##e5e5e5;
+	border:1px solid #000000;
+	border-width:0px 1px 1px 0px;
+	text-align:center;
+	padding:7px;
+	font-size:10px;
+	font-family:Arial;
+	font-weight:bold;
+	color:#000000;
+}.container tr:last-child td{
+	border-width:0px 1px 1px 0px;
+}.container tr td:last-child{
+	border-width:0px 0px 1px 0px;
+}.container tr:last-child td:last-child{
+	border-width:0px 0px 1px 0px;
+}
+.container tr:first-child td{
+  background:-o-linear-gradient(bottom, #cccccc 5%, #b2b2b2 100%);
+  background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #cccccc), color-stop(1, #b2b2b2) );
+	background:-moz-linear-gradient( center top, #cccccc 5%, #b2b2b2 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr="#cccccc", endColorstr="#b2b2b2");
+  background: -o-linear-gradient(top,#cccccc,b2b2b2);
+
+	background-color:#cccccc;
+	border:0px solid #000000;
+	text-align:center;
+	border-width:0px 0px 1px 1px;
+	font-size:14px;
+	font-family:Arial;
+	font-weight:bold;
+	color:#000000;
+}
+.container tr:first-child:hover td{
+  background:-o-linear-gradient(bottom, #eee 5%, #b2b2b2 100%);
+  background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #eee), color-stop(1, #b2b2b2) );
+	background:-moz-linear-gradient( center top, #eee 5%, #b2b2b2 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr="#cccccc", endColorstr="#b2b2b2");
+  background: -o-linear-gradient(top,#eee,b2b2b2);
+
+	background-color:#eee;
+}
+.container tr:first-child td:first-child{
+	border-width:0px 0px 1px 0px;
+}
+.container tr:first-child td:last-child{
+	border-width:0px 0px 1px 1px;
 }
   /*
   * Center the body content
@@ -95,6 +200,7 @@ body {
 .container {
   width:80%;
   margin:0 auto;
+  background-color:#dddddd;
 }
 
 .jumbo {
@@ -145,10 +251,12 @@ h3 {
 
 .social li {display: inline;}
 .ft{
-   background-color: #efff;
+  margin-top:5%;
+  clear:both;
+  background-color: #eeeeee;
   opacity: .85;
   border-top: 2px solid #eee; font-size:12px;
-  margin-top:2%;
+  margin-top:4%;
   width:inherit;
 }
 .abt{float: left; width:20.05%; margin-right:20%;}
