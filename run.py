@@ -2,6 +2,8 @@ from flask import Flask,request, render_template, jsonify
 import config
 import json
 from config import DATABASE as db, NODE_COLLECTION as nc
+import math
+from math import ceil
 
 app = Flask(__name__)
 
@@ -24,7 +26,7 @@ def gcecost():
 def nodes():
     machineList= [machine for machine in nc.find({},{'_id':False})]
     #my_keys = ['node','os','cpu', 'memory', 'disk']
-    return render_template('nodes.html', data=machineList)
+    return render_template('nodes.html', data=machineList, ceil=ceil)
 
     """
     for machine in nc.find({},{'_id':False}):
@@ -38,7 +40,6 @@ def nodes():
 
     """
     #return  page
-
 if __name__ == '__main__':
 
     app.run(debug=True, host='0.0.0.0')

@@ -23,12 +23,12 @@
   </tr>
   <tr>
     <td>Memory (GB)</td>
-    <td>{{machine['memory']}}</td>
+    <td>{{ '%0.0f' %(ceil((machine['memory']|float)))}}</td>
 
   </tr>
   <tr>
     <td>Storage (GB)</td>
-    <td>{{machine['disk']}}</td>
+    <td>{{ '%0.0f' %(ceil((machine['disk']|float)))}}</td>
   </tr>
   </table>
   {% endfor %}
