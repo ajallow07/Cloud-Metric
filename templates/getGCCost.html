@@ -2,6 +2,16 @@
 {% block content %}
 <div class="jumbo" >
   <h2>Google Cloud Cost Estimates</h2>
-  <p>This page gives the cost estimates</p>
+  <div>The cost estimates for each of the instances assumes US regions. Later we'll include the
+  option to retrieve cost by region </div>
+  {% if data %}
+    {% for (machine, price) in data %}
+      <div class="prices">
+      <table>
+      <tr><td>{{machine['node']}}</td><td>&#36;{{'%0.2f' %price}}</td></tr>
+    </table>
+    </div>
+    {% endfor %}
+  {% endif %}
 </div>
 {% endblock %}

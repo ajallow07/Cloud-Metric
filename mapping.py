@@ -1,5 +1,9 @@
 #! /usr/bin/env python
 
+import csv
+import sys
+import json
+import re
 
 """
 In this file, we search through the Google and Amazon pricing data and gives
@@ -107,7 +111,7 @@ def getMatchingInstanceInGCE(gceflavors, vcpu, memory):
         if flavor["mf"] == minimumDiff:
             matchingFavors.append(flavor['name'])
     return matchingFavors
-
-
+"""
 if __name__=="__main__":
     print getMatchingInstanceInGCE(GC_FLAVORS,16,40)
+"""

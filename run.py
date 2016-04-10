@@ -1,12 +1,20 @@
 from flask import Flask,request, render_template, jsonify
 import config
+import os
+from mapping import getMatchingInstanceInGCE, getMatchingInstanceInAWS, AWS_FLAVORS, GC_FLAVORS
+from calc import gce_price, aws_storage_prices, read_EC2_ondemand_instance_prices
 import json
 from config import DATABASE as db, NODE_COLLECTION as nc
 import math
+from jinja2 import Environment, FileSystemLoader
 from math import ceil
 
 app = Flask(__name__)
 
+# Define the template directory
+#tpldir = os.path.dirname(os.path.abspath(__file__))+'/templates/'
+# Setup the template enviroment
+#env = Environment(loader=FileSystemLoader(tpldir), trim_blocks=True)
 
 @app.route('/')
 def home():
@@ -16,11 +24,32 @@ def home():
 
 @app.route('/awscost')
 def awscost():
-    return render_template('getAWSCost.html')
+    computedCost = []
+    machineList = [machine for machine in nc.find({},{'_id':False})]
+
+    for machine in machineList:
+        flavor = getMatchingInstanceInAWS(AWS_FLAVORS, machine['cpu'], ceil(float(machine['memory'])))
+        instanceCost = read_EC2_ondemand_instance_prices(1, "us-east-1", flavor[0], machine['os'].lower())
+        storageCost = aws_storage_prices("us-east-1", ceil(float(machine['disk'])))
+        monthlyCost = instanceCost + storageCost
+        computedCost.append(monthlyCost)
+    return render_template('getAWSCost.html', data=zip(machineList,computedCost))
+
+@app.route ('/nodecost')
+def nodecosts():
+    return 'This show individual node cost'
+
 
 @app.route('/gcecost')
 def gcecost():
-    return render_template('getGCCost.html')
+    computedCost = []
+    machineList = [machine for machine in nc.find({},{'_id':False})]
+
+    for machine in machineList:
+        flavor = getMatchingInstanceInGCE(GC_FLAVORS, machine['cpu'], ceil(float(machine['memory'])))
+        instanceCost = gce_price(1,"regular", "us", flavor[0], ceil(float(machine['disk'])), machine['os'] , 0)
+        computedCost.append(instanceCost)
+    return render_template('getGCCost.html', data=zip(machineList,computedCost))
 
 @app.route('/nodes')
 def nodes():
@@ -28,17 +57,6 @@ def nodes():
     #my_keys = ['node','os','cpu', 'memory', 'disk']
     return render_template('nodes.html', data=machineList, ceil=ceil)
 
-    """
-    for machine in nc.find({},{'_id':False}):
-        machineList.append(machine)
-    return render_template('nodes.html', data = machineList)
-
-
-    with open('machines.json', 'w') as output:
-        machienList =json.dump([machine for machine in nc.find({},{'_id':False})], output)
-        #output.write(data)
-
-    """
     #return  page
 if __name__ == '__main__':
 

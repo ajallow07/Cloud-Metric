@@ -50,7 +50,7 @@ def aws_storage_prices(region, storage_size):
 	#print monthly_Storage_Cost
 
 #computes the an estimated mponthly cost of running instances on google cloud
-def gce_price(instances, vm_class, zone, machine_type, storage_size, os,ssd_number):
+def gce_price(instances, vm_class, zone, machine_type, storage_size, os, ssd_number):
 
 	config = json.loads(open("Google pricelist.json").read())
 	sustained_use_discount = 0.7
@@ -84,7 +84,7 @@ def gce_price(instances, vm_class, zone, machine_type, storage_size, os,ssd_numb
 			paid_os_cost = instances * vCPUs * float(config['gcp_price_list']['CP-COMPUTEENGINE-OS'][os]['high']) * average_monthly_hours
 
 
-	if vm_class == 1:
+	if vm_class == "preemtible":
 		monthly_cost = (instances * float(flavor_hourly_cost) * average_monthly_hours)
 	else:
 		monthly_cost = (instances * float(flavor_hourly_cost)*average_monthly_hours) * sustained_use_discount
@@ -94,7 +94,7 @@ def gce_price(instances, vm_class, zone, machine_type, storage_size, os,ssd_numb
 
 	storage_cost = storage_size * float(config['gcp_price_list']["CP-BIGSTORE-STORAGE"]['us'])
 	total_vms_monthly_cost = storage_cost + total_monthly_cost
-	return total_monthly_cost, storage_cost, total_vms_monthly_cost
+	return total_vms_monthly_cost
 
 #==============================================================================================================
 
@@ -165,6 +165,7 @@ if __name__ == "__main__":
 		#print aws_storage_prices(REGION, STORAGE_SIZE)
 
 	if user_choice==2:
+
 		print "Selecting VMs choices...."
 
 		#selects regions
