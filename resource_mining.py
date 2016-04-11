@@ -1,22 +1,18 @@
-#! /usr/bin/env python
+ #! /usr/bin/env python
 
 """Prints system usage info. vCPU, Memory, and Storage
 
 """
 import pymongo
 from pymongo import MongoClient
-import platform
+import platform, socket
 import psutil
 import sys
 import datetime
 import os
 import json
 
-NODE = platform.uname()[1]
-OS = platform.system()
-vCPU_COUNT = 0
-MEMORY_SIZE = 0
-DISK_SIZE = 0
+
 
 """
 Retrieve memmory information
@@ -62,16 +58,7 @@ def get_block_storage():
         usage = psutil.disk_usage(part.mountpoint)
         disk_size = bytes_to_human(usage.total)
     return disk_size
-"""
-Returns a json for each machine:
-{ machine: name,
-    specs: {
-        cpu:,
-        memory:,
-        disk:
-    }
-}
-"""
+
 def detect_ncpus():
         """Detects the number of effective CPUs in the system"""
         #for Linux, Unix and MacOS
@@ -97,7 +84,14 @@ def insert_data():
     MEMORY_SIZE = get_total_memory(psutil.virtual_memory())
     DISK_SIZE = get_block_storage()
     vCPU_COUNT = detect_ncpus()
-    values = {'node': NODE, 'os': OS, 'cpu': vCPU_COUNT, 'memory': MEMORY_SIZE, 'disk': DISK_SIZE}
+    doc = dict()
+    doc['node'] = socket.gethostname()
+    doc['os'] = platform.system()
+    doc['cpu'] = detect_ncpus(),
+    doc['memory'] = get_total_memory(psutil.virtual_memory()),
+    doc['disk'] = get_block_storage()
+
+    #values = {'node': NODE, 'os': OS, 'cpu': vCPU_COUNT, 'memory': MEMORY_SIZE, 'disk': DISK_SIZE}
     #print vCPU_COUNT
     #print values
     #Connect to MongoDB
@@ -105,19 +99,13 @@ def insert_data():
     try:
         client = MongoClient('130.238.29.106', 27017)
         db = client['vm_nodes']
-        result = db.machines.insert_one(values)
+        result = db.machines.insert_one(doc)
 
-        obj_id = result.inserted_id
+        #obj_id = result.inserted_id
         #print obj_id
     except Exception as e:
         print "Could not insert data to db: "+str(e)
 
-"""
-    cursor = db.machines.find()
-
-    for vm in cursor:
-        print(vm)
-"""
 
 if __name__=='__main__':
     insert_data()

@@ -1,9 +1,7 @@
 #! /usr/bin/env python
 
-import csv
-import sys
-import json
-import re
+import csv, sys, json, re
+import multiprocessing, os, re, sys, time
 
 """
 In this file, we search through the Google and Amazon pricing data and gives
@@ -76,6 +74,7 @@ GC_FLAVORS = [   {"name":"F1-MICRO" , "param": {"vCPU": 1, "memory": 0.60},"mf":
                 {"name":"N1-HIGHCPU-32", "param": {"vCPU": 32, "memory": 28.80},"mf": 0}
             ]
 
+
 def getMatchingInstanceInAWS(awsflavors, vcpu, memory):
     for flavor in awsflavors:
         #get the absolute differences in vCPU and memory usages
@@ -111,7 +110,42 @@ def getMatchingInstanceInGCE(gceflavors, vcpu, memory):
         if flavor["mf"] == minimumDiff:
             matchingFavors.append(flavor['name'])
     return matchingFavors
-"""
-if __name__=="__main__":
-    print getMatchingInstanceInGCE(GC_FLAVORS,16,40)
-"""
+
+
+
+cgroup_dir = '/sys/fs/cgroup'
+node_rgx = u'[a-z]*[0-9]{2}'
+interval = 1
+
+def main():
+  cpus = multiprocessing.cpu_count()
+  startval = get_values()
+  time.sleep(interval)
+  endval = get_values()
+  for key, value in startval.iteritems():
+    if key in endval:
+      delta = int(endval[key]) - int(startval[key])
+      dpns = float(delta / interval)
+      dps = dpns / 1000000000
+      percent = dps / cpus
+      print key + ':' + '{percent:.2%}'.format(percent=percent)
+
+
+def get_values():
+  values = {}
+  if os.path.exists('%s/cpuacct.usage' % cgroup_dir):
+    with open('%s/cpuacct.usage' % cgroup_dir, 'rb') as tobj:
+      values['total'] = tobj.read()
+  else:
+    sys.exit(1)
+  for fd in os.listdir(cgroup_dir):
+    if os.path.isdir('%s/%s' % (cgroup_dir, fd)) and re.match(node_rgx, fd):
+      acctf = '%s/%s/cpuacct.usage' % (cgroup_dir, fd)
+      if os.path.isfile(acctf):
+        with open(acctf, 'rb') as accto:
+          values[fd] = accto.read()
+  return values
+
+
+if __name__ == "__main__":
+    main()

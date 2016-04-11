@@ -4,7 +4,7 @@ import os
 from mapping import getMatchingInstanceInGCE, getMatchingInstanceInAWS, AWS_FLAVORS, GC_FLAVORS
 from calc import gce_price, aws_storage_prices, read_EC2_ondemand_instance_prices
 import json
-from config import DATABASE as db, NODE_COLLECTION as nc
+from config import DB_NODE as db, DB_REPORT as dr, NODE_COLLECTION as nc, REPORT_COLLECTION as rc
 import math
 from jinja2 import Environment, FileSystemLoader
 from math import ceil
@@ -16,6 +16,28 @@ app = Flask(__name__)
 # Setup the template enviroment
 #env = Environment(loader=FileSystemLoader(tpldir), trim_blocks=True)
 
+#monitoring aspect
+@app.route('/charts/')
+def load_data():
+    data_cursor = rc.find({'node': "aj-hadoop-master"})
+
+    cpu_user = []
+    mem_per = []
+    disk_usage = []
+
+    for data in data_cursor:
+        date = data['dt']
+        disk_usage.append([date, data['disk']])
+        mem_per.append([date, data['memory']])
+        cpu_user.append([date, data['cpu']['user']])
+
+    return {
+            'disk_data': disk_usage,
+            'memory_usage': mem_per,
+            'cpu_user': cpu_user
+        }
+
+
 @app.route('/')
 def home():
     nodes = nc.count()
@@ -25,7 +47,7 @@ def home():
 @app.route('/awscost')
 def awscost():
     computedCost = []
-    machineList = [machine for machine in nc.find({},{'_id':False})]
+    machineList = [machine for machine in nc.find({},{'_id': False})]
 
     for machine in machineList:
         flavor = getMatchingInstanceInAWS(AWS_FLAVORS, machine['cpu'], ceil(float(machine['memory'])))
