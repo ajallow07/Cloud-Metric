@@ -56,7 +56,9 @@ def show_charts(chartID='chart_ID', chart_type='spline', chart_height=500):
         }
     ]
     title = {"text": 'CPU Usage'}
-    xAxis = {"type": 'datetime', "label": "datetime"}
+    xAxis = {"type": 'datetime', 
+        "categories": [cpu_user[0]]
+    }
     yAxis = {"title": {"text": 'Usage Percent'}}
 
     return render_template('graphs.html', chartID=chartID, chart= chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
