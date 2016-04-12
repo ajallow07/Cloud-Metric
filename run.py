@@ -8,6 +8,8 @@ from config import DB_NODE as db, DB_REPORT as dr, NODE_COLLECTION as nc, REPORT
 import math
 from jinja2 import Environment, FileSystemLoader
 from math import ceil
+from bson import json_util
+from bson.json_util import dumps
 
 app = Flask(__name__)
 
@@ -15,28 +17,71 @@ app = Flask(__name__)
 #tpldir = os.path.dirname(os.path.abspath(__file__))+'/templates/'
 # Setup the template enviroment
 #env = Environment(loader=FileSystemLoader(tpldir), trim_blocks=True)
+FIELDS = {'node': True, 'dt': True, 'disk': True, 'memory': True, 'cpu': True, '_id': False}
 
 #monitoring aspect
-@app.route('/charts/')
-def load_data():
-    data_cursor = rc.find({'node': "aj-hadoop-master"})
-
+@app.route('/show_charts')
+def show_charts(chartID='chart_ID', chart_type='spline', chart_height=500):
+    data_cursor = rc.find({'node':'Alieus-MacBook-Pro.local'})
     cpu_user = []
     mem_per = []
     disk_usage = []
-
+    json_data =[]
     for data in data_cursor:
+        #json_data.append(data)
         date = data['dt']
-        disk_usage.append([date, data['disk']])
-        mem_per.append([date, data['memory']])
-        cpu_user.append([date, data['cpu']['user']])
+        date_str = date.strftime('%Y-%m-%d %H:%M')
+        disk_usage.append([date_str, data['disk']])
+        mem_per.append([date_str, data['memory']])
+        cpu_user.append([date_str, data['cpu']['user']])
 
-    return {
-            'disk_data': disk_usage,
-            'memory_usage': mem_per,
-            'cpu_user': cpu_user
+        #json_cpu.append(cpu_user)
+    json_data = json.dumps(cpu_user, default=json_util.default)
+
+    chart = {"renderTo": chartID, "type": chart_type, "height": chart_height}
+    credits = { }
+    series = [
+        {"name": 'cpu',
+        "type": 'spline',
+        "data": cpu_user
+        }, {
+            "name" : 'memory',
+            "type": 'spline',
+            "data" :  mem_per
+        },
+        {
+            "name": 'disk',
+            "type": 'spline',
+            "data": disk_usage
         }
+    ]
+    title = {"text": 'CPU Usage'}
+    xAxis = {"type": 'datetime', "label": "datetime"}
+    yAxis = {"title": {"text": 'Usage Percent'}}
 
+    return render_template('graphs.html', chartID=chartID, chart= chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
+
+
+@app.route('/charts/show_data')
+def load_data():
+
+    data_cursor = rc.find({'node':'aj-hadoop-master'})
+    cpu_user = []
+    mem_per = []
+    disk_usage = []
+    json_data =[]
+    for data in data_cursor:
+        #json_data.append(data)
+        date = data['dt']
+        date_str = date.strftime('%Y-%m-%d %H:%M')
+        #disk_usage.append([date, data['disk']])
+        #mem_per.append([date, data['memory']])
+        cpu_user.append([date_str, data['cpu']['user']])
+
+        #json_cpu.append(cpu_user)
+        json_data = json.dumps(cpu_user, default=json_util.default)
+
+    return json_data
 
 @app.route('/')
 def home():

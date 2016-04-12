@@ -14,13 +14,14 @@
 <body>
   <header>
       <div class="container">
-        <h1 class="logo">Cloud-Metric Framework</h1>
+        <h1 class="logo">Cloud-Metric</h1>
         <strong><nav>
         <ul class="menu">
           <li><a href="{{ url_for('home') }}">Home</a></li>
           <li><a href="{{ url_for('nodes') }}">Nodes</a></li>
           <li><a href="{{ url_for('awscost') }}">Amazon AWS</a></li>
           <li><a href="{{ url_for('gcecost') }}">Google Cloud</a></li>
+            <li><a href="{{ url_for('show_charts') }}">Monitoring Charts</a></li>
         </ul>
     </nav></strong>
       </div>
@@ -35,8 +36,11 @@
 
         {% endblock %}
     </div>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="/static/js/jquery.js">\x3C/script>')</script>
+    <div class="container">
+      {% block charts %}
+
+      {% endblock %}
+    </div>
 
     <footer class="ft">
         <div class="container">
