@@ -20,25 +20,26 @@ app = Flask(__name__)
 FIELDS = {'node': True, 'dt': True, 'disk': True, 'memory': True, 'cpu': True, '_id': False}
 
 #monitoring aspect
-@app.route('/show_charts')
-def show_charts(chartID='chart_ID', chart_type='spline', chart_height=500):
-    data_cursor = rc.find({'node':'Alieus-MacBook-Pro.local'})
+@app.route('/show_charts/<machine>')
+def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=500, zoom_type='x', background_color='transparent'):
+    data_cursor = rc.find(projection=FIELDS)
     cpu_user = []
     mem_per = []
     disk_usage = []
-    json_data =[]
+    json_data = []
     for data in data_cursor:
         #json_data.append(data)
-        date = data['dt']
-        date_str = date.strftime('%Y-%m-%d %H:%M')
-        disk_usage.append([date_str, data['disk']])
-        mem_per.append([date_str, data['memory']])
-        cpu_user.append([date_str, data['cpu']['user']])
+        if data['node'] == machine:
+            date = data['dt']
+            date_str = date.strftime('%b %d, %H:%M')
+            disk_usage.append([date_str, data['disk']])
+            mem_per.append([date_str, data['memory']])
+            cpu_user.append([date_str, data['cpu']['user']])
 
         #json_cpu.append(cpu_user)
     json_data = json.dumps(cpu_user, default=json_util.default)
 
-    chart = {"renderTo": chartID, "type": chart_type, "height": chart_height}
+    chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, "zoomType": zoom_type, "backgroundColor": background_color}
     credits = { }
     series = [
         {"name": 'cpu',
@@ -55,11 +56,12 @@ def show_charts(chartID='chart_ID', chart_type='spline', chart_height=500):
             "data": disk_usage
         }
     ]
-    title = {"text": 'CPU Usage'}
-    xAxis = {"type": 'datetime', 
-        "categories": [cpu_user[0]]
+    title = {"text": 'Resources Monitoring Metrics'}
+    xAxis = {"type": 'datetime',
+        "categories": [cpu_user[0]],
+        "tickInterval": 360
     }
-    yAxis = {"title": {"text": 'Usage Percent'}}
+    yAxis = {"title": {"text": 'Usage %'}}
 
     return render_template('graphs.html', chartID=chartID, chart= chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
 

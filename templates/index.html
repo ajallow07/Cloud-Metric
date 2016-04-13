@@ -21,7 +21,6 @@
           <li><a href="{{ url_for('nodes') }}">Nodes</a></li>
           <li><a href="{{ url_for('awscost') }}">Amazon AWS</a></li>
           <li><a href="{{ url_for('gcecost') }}">Google Cloud</a></li>
-            <li><a href="{{ url_for('show_charts') }}">Monitoring Charts</a></li>
         </ul>
     </nav></strong>
       </div>
@@ -36,7 +35,7 @@
 
         {% endblock %}
     </div>
-    <div class="container">
+    <div class="container" class="monitors">
       {% block charts %}
 
       {% endblock %}
