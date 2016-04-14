@@ -99,9 +99,8 @@ body {
   margin-right:15%
   border-collapse: collapse;
   border-spacing: 0;
-	width:33.3%;
+	width:100%;
   padding:5px;
-  float:left;
 	-moz-border-radius-bottomleft:12px;
 	-webkit-border-bottom-left-radius:12px;
 	border-bottom-left-radius:12px;

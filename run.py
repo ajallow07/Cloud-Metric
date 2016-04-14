@@ -1,11 +1,8 @@
 from flask import Flask,request, render_template, jsonify
-import config
-import os
+import config, os, math, json
 from mapping import getMatchingInstanceInGCE, getMatchingInstanceInAWS, AWS_FLAVORS, GC_FLAVORS
-from calc import gce_price, aws_storage_prices, read_EC2_ondemand_instance_prices
-import json
+from computeCost import gce_price, aws_storage_prices, read_EC2_ondemand_instance_prices
 from config import DB_NODE as db, DB_REPORT as dr, NODE_COLLECTION as nc, REPORT_COLLECTION as rc
-import math
 from jinja2 import Environment, FileSystemLoader
 from math import ceil
 from bson import json_util
@@ -17,24 +14,25 @@ app = Flask(__name__)
 #tpldir = os.path.dirname(os.path.abspath(__file__))+'/templates/'
 # Setup the template enviroment
 #env = Environment(loader=FileSystemLoader(tpldir), trim_blocks=True)
-FIELDS = {'node': True, 'dt': True, 'disk': True, 'memory': True, 'cpu': True, '_id': False}
+#FIELDS = {'node': True, 'dt': True, 'disk': True, 'memory': True, 'cpu': True, '_id': False}
 
 #monitoring aspect
 @app.route('/show_charts/<machine>')
 def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=500, zoom_type='x', background_color='transparent'):
-    data_cursor = rc.find(projection=FIELDS)
+    FILTER = {'node': machine}
+    data_cursor = rc.find(FILTER).skip(rc.find(FILTER).count()-600)
     cpu_user = []
     mem_per = []
     disk_usage = []
     json_data = []
     for data in data_cursor:
         #json_data.append(data)
-        if data['node'] == machine:
-            date = data['dt']
-            date_str = date.strftime('%b %d, %H:%M')
-            disk_usage.append([date_str, data['disk']])
-            mem_per.append([date_str, data['memory']])
-            cpu_user.append([date_str, data['cpu']['user']])
+        #if data['node'] == machine:
+        date = data['dt']
+        date_str = date.strftime('%b %d, %H:%M')
+        disk_usage.append([date_str, data['disk']])
+        mem_per.append([date_str, data['memory']])
+        cpu_user.append([date_str, data['cpu']['user']])
 
         #json_cpu.append(cpu_user)
     json_data = json.dumps(cpu_user, default=json_util.default)
@@ -69,7 +67,7 @@ def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=5
 @app.route('/charts/show_data')
 def load_data():
 
-    data_cursor = rc.find({'node':'aj-hadoop-master'})
+    data_cursor = rc.find({'node':'aj-hadoop-master'}).skip(rc.find({'node':'aj-hadoop-master'}).count()-5)
     cpu_user = []
     mem_per = []
     disk_usage = []

@@ -7,6 +7,8 @@ import re
 
 #computes the estimated monthly prices of running AWS instances
 def read_EC2_ondemand_instance_prices(number, region, flavor, os):
+	if os == "darwin" or os=="POSIX":
+		os="linux"
 	if number <=0:
 		return 0
 	ifile  = open('../awspricingfull-master/EC2_OnDemand.csv', "r")

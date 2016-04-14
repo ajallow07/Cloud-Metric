@@ -2,35 +2,25 @@
 
 {% block instanceDetails %}
   <span>Number of machines in your enviroment! Click on  each node to show its cost of Google Cloud and Amazon AWS</span>
- {% for machine in data %}
+
   <table>
   <tr>
-    <td>Parameter</td>
-    <td>Value</td>
-  <tr>
-  <tr>
     <td>Node</td>
-    <td>{{machine['node']}}</td>
-  </tr>
-  <tr>
     <td>OS</td>
-    <td>{{machine['os']}}</td>
-  </tr>
-  <tr>
     <td>vCPU</td>
-    <td>{{machine['cpu']}}</td>
-
-  </tr>
-  <tr>
     <td>Memory (GB)</td>
-    <td>{{ '%0.0f' %(ceil((machine['memory']|float)))}}</td>
-
-  </tr>
+    <td>storage (GB)</td>
   <tr>
-    <td>Storage (GB)</td>
+  {% for machine in data %}
+  <tr>
+    <td>{{machine['node']}}&nbsp;&nbsp;&nbsp;<a href="{{url_for('show_charts', machine=machine['node'])}}">Monitor</a></td>
+    <td>{{machine['os']}}</td>
+    <td>{{machine['cpu']}}</td>
+    <td>{{ '%0.0f' %(ceil((machine['memory']|float)))}}</td>
     <td>{{ '%0.0f' %(ceil((machine['disk']|float)))}}</td>
   </tr>
-  </table>
   {% endfor %}
+  </table>
+
 
 {% endblock %}
