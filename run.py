@@ -57,7 +57,7 @@ def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=5
     title = {"text": 'Resources Monitoring Metrics'}
     xAxis = {"type": 'datetime',
         "categories": [cpu_user[0]],
-        "tickInterval": 360
+        "tickInterval": 60
     }
     yAxis = {"title": {"text": 'Usage %'}}
 
