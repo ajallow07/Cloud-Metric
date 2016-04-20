@@ -12,8 +12,6 @@ import datetime
 import os
 import json
 
-
-
 """
 Retrieve memmory information
 """

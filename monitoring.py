@@ -49,4 +49,4 @@ if __name__ == '__main__':
     import time
     while True:
         main()
-        time.sleep(30) # pause for 30 seconds
+        time.sleep(60) # pause for 30 seconds

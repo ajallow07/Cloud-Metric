@@ -18,9 +18,13 @@ app = Flask(__name__)
 
 #monitoring aspect
 @app.route('/show_charts/<machine>')
-def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=500, zoom_type='x', background_color='transparent'):
+def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=500, zoom_type='x'):
     FILTER = {'node': machine}
-    data_cursor = rc.find(FILTER).skip(rc.find(FILTER).count()-600)
+    if rc.find(FILTER).count() < 600:
+        data_cursor = rc.find(FILTER)
+    else:
+        data_cursor = rc.find(FILTER).skip(rc.find(FILTER).count()-600)
+
     cpu_user = []
     mem_per = []
     disk_usage = []
@@ -35,39 +39,43 @@ def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=5
         cpu_user.append([date_str, data['cpu']['user']])
 
         #json_cpu.append(cpu_user)
-    json_data = json.dumps(cpu_user, default=json_util.default)
+       #json_data = json.dumps(cpu_user, default=json_util.default)
 
-    chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, "zoomType": zoom_type, "backgroundColor": background_color}
+    chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, "zoomType": zoom_type}
     credits = { }
-    series = [
-        {"name": 'cpu',
-        "type": 'spline',
-        "data": cpu_user
-        }, {
-            "name" : 'memory',
+    if cpu_user:
+        series = [
+            {"name": 'cpu',
             "type": 'spline',
-            "data" :  mem_per
-        },
-        {
-            "name": 'disk',
-            "type": 'spline',
-            "data": disk_usage
+            "data": cpu_user
+            }, {
+                "name" : 'memory',
+                "type": 'spline',
+                "data" :  mem_per
+            },
+            {
+                "name": 'disk',
+                "type": 'spline',
+                "data": disk_usage
+            }
+        ]
+        title = {"text": 'Resources Monitoring Metrics'}
+        xAxis = {"type": 'datetime',
+            "categories": [cpu_user[0]],
+            "tickInterval": 60
         }
-    ]
-    title = {"text": 'Resources Monitoring Metrics'}
-    xAxis = {"type": 'datetime',
-        "categories": [cpu_user[0]],
-        "tickInterval": 60
-    }
-    yAxis = {"title": {"text": 'Usage %'}}
+        yAxis = {"title": {"text": 'Usage %'}}
 
-    return render_template('graphs.html', chartID=chartID, chart= chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
+        return render_template('graphs.html', chartID=chartID, chart= chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
+
+    return render_template('graphs.html', chartID=chartID, chart= chart, series=[], title="Resource Monitoring", xAxis={}, yAxis={})
 
 
 @app.route('/charts/show_data')
 def load_data():
 
-    data_cursor = rc.find({'node':'aj-hadoop-master'}).skip(rc.find({'node':'aj-hadoop-master'}).count()-5)
+    #data_cursor = rc.find({'node':'aj-hadoop-master'}).skip(rc.find({'node':'aj-hadoop-master'}).count()-0)
+    data_cursor = rc.find({'node':'aj-hadoop-master'})
     cpu_user = []
     mem_per = []
     disk_usage = []

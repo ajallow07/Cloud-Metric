@@ -93,7 +93,10 @@ body {
 	-webkit-border-top-left-radius:12px;
 	border-top-left-radius:12px;
 }
-
+.monitors {
+  width: 100%
+  background-color: #ffffff;
+}
 .container table {
   margin-top:1%;
   margin-right:15%

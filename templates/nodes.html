@@ -15,7 +15,7 @@
   <tr>
     <td>{{machine['node']}}&nbsp;&nbsp;&nbsp;<a href="{{url_for('show_charts', machine=machine['node'])}}">Monitor</a></td>
     <td>{{machine['os']}}</td>
-    <td>{{machine['cpu']}}</td>
+    <td>{{machine['cpu']|safe}}</td>
     <td>{{ '%0.0f' %(ceil((machine['memory']|float)))}}</td>
     <td>{{ '%0.0f' %(ceil((machine['disk']|float)))}}</td>
   </tr>
