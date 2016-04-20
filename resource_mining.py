@@ -3,14 +3,10 @@
 """Prints system usage info. vCPU, Memory, and Storage
 
 """
-import pymongo
-from pymongo import MongoClient
 import platform, socket
-import psutil
-import sys
-import datetime
-import os
-import json
+import psutil, config
+from config import DB_NODE
+import sys, datetime, os, json
 
 """
 Retrieve memmory information
@@ -79,14 +75,14 @@ def detect_ncpus():
 
 def insert_data():
 #   returns a json object
-    MEMORY_SIZE = get_total_memory(psutil.virtual_memory())
-    DISK_SIZE = get_block_storage()
-    vCPU_COUNT = detect_ncpus()
+    #MEMORY_SIZE = get_total_memory(psutil.virtual_memory())
+    #DISK_SIZE = get_block_storage()
+    #vCPU_COUNT = detect_ncpus()
     doc = dict()
     doc['node'] = socket.gethostname()
     doc['os'] = platform.system()
-    doc['cpu'] = detect_ncpus(),
-    doc['memory'] = get_total_memory(psutil.virtual_memory()),
+    doc['cpu'] = detect_ncpus()
+    doc['memory'] = get_total_memory(psutil.virtual_memory())
     doc['disk'] = get_block_storage()
 
     #values = {'node': NODE, 'os': OS, 'cpu': vCPU_COUNT, 'memory': MEMORY_SIZE, 'disk': DISK_SIZE}
@@ -95,8 +91,7 @@ def insert_data():
     #Connect to MongoDB
 
     try:
-        client = MongoClient('130.238.29.106', 27017)
-        db = client['vm_nodes']
+        db = DB_NODE
         result = db.machines.insert_one(doc)
 
         #obj_id = result.inserted_id
