@@ -40,7 +40,7 @@ def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=5
 
         #json_cpu.append(cpu_user)
        #json_data = json.dumps(cpu_user, default=json_util.default)
-
+    text_title = "Resource Monitring metrics: "+str(machine)
     chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, "zoomType": zoom_type}
     credits = { }
     if cpu_user:
@@ -59,7 +59,7 @@ def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=5
                 "data": disk_usage
             }
         ]
-        title = {"text": 'Resources Monitoring Metrics'}
+        title = {"text": text_title}
         xAxis = {"type": 'datetime',
             "categories": [cpu_user[0]],
             "tickInterval": 60
@@ -103,14 +103,15 @@ def home():
 def awscost():
     computedCost = []
     machineList = [machine for machine in nc.find({},{'_id': False})]
-
+    totalCost = 0
     for machine in machineList:
         flavor = getMatchingInstanceInAWS(AWS_FLAVORS, machine['cpu'], ceil(float(machine['memory'])))
         instanceCost = read_EC2_ondemand_instance_prices(1, "us-east-1", flavor[0], machine['os'].lower())
         storageCost = aws_storage_prices("us-east-1", ceil(float(machine['disk'])))
         monthlyCost = instanceCost + storageCost
+        totalCost += monthlyCost
         computedCost.append(monthlyCost)
-    return render_template('getAWSCost.html', data=zip(machineList,computedCost))
+    return render_template('getAWSCost.html', data=zip(machineList,computedCost), total=totalCost)
 
 @app.route ('/nodecost')
 def nodecosts():
@@ -121,12 +122,13 @@ def nodecosts():
 def gcecost():
     computedCost = []
     machineList = [machine for machine in nc.find({},{'_id':False})]
-
+    totalCost = 0
     for machine in machineList:
         flavor = getMatchingInstanceInGCE(GC_FLAVORS, machine['cpu'], ceil(float(machine['memory'])))
         instanceCost = gce_price(1,"regular", "us", flavor[0], ceil(float(machine['disk'])), machine['os'] , 0)
+        totalCost += instanceCost
         computedCost.append(instanceCost)
-    return render_template('getGCCost.html', data=zip(machineList,computedCost))
+    return render_template('getGCCost.html', data=zip(machineList,computedCost), total=totalCost)
 
 @app.route('/nodes')
 def nodes():
