@@ -79,14 +79,14 @@ def detect_ncpus():
 
 def insert_data():
 #   returns a json object
-    MEMORY_SIZE = get_total_memory(psutil.virtual_memory())
-    DISK_SIZE = get_block_storage()
-    vCPU_COUNT = detect_ncpus()
+    #MEMORY_SIZE = get_total_memory(psutil.virtual_memory())
+    #DISK_SIZE = get_block_storage()
+    #vCPU_COUNT = detect_ncpus()
     doc = dict()
     doc['node'] = socket.gethostname()
     doc['os'] = platform.system()
-    doc['cpu'] = detect_ncpus(),
-    doc['memory'] = get_total_memory(psutil.virtual_memory()),
+    doc['cpu'] = detect_ncpus()
+    doc['memory'] = get_total_memory(psutil.virtual_memory())
     doc['disk'] = get_block_storage()
 
     #values = {'node': NODE, 'os': OS, 'cpu': vCPU_COUNT, 'memory': MEMORY_SIZE, 'disk': DISK_SIZE}
