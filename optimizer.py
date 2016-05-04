@@ -3,6 +3,7 @@
 import config
 import math
 import mapping
+from mapping import getMatchingInstanceInGCE, getMatchingInstanceInAWS, AWS_FLAVORS, GC_FLAVORS
 from config import DB_NODE as db, DB_REPORT as dr, NODE_COLLECTION as nc, REPORT_COLLECTION as rc
 #Node for support of  multi cluster , we will need cluster Id identification
 
@@ -47,10 +48,27 @@ def get_resources_utilized():
     machine_resources = dict()
     for machine in get_nodes_in_cluster():
         machine_resources.update({machine:{'cpu': get_max_cpu_utilized(machine), 'memory':get_max_memory_utilized(machine)}})
-        #machine_resources.update(machine:{})
+        #machine_resources.update(machine:)
 
     return machine_resources
 
+def get_matching_instance_in_gcp(doc):
+    gcp_instances =[]
+    for machine in doc:
+         flavors = getMatchingInstanceInGCE(GC_FLAVORS, get_max_cpu_utilized(machine), get_max_memory_utilized(machine))
+         gcp_instances.append(flavors)
+    return gcp_instances
+
+def get_matching_instance_in_aws(doc):
+    aws_instances =[]
+    for machine in doc:
+        flavors = getMatchingInstanceInAWS(AWS_FLAVORS, get_max_cpu_utilized(machine), get_max_memory_utilized(machine))
+        aws_instances.append(flavors)
+    return aws_instances
+
+
 if __name__ == '__main__':
     #print get_max_cpu_utilized("dev-node")
-    print get_resources_utilized()
+    #machine = get_resources_utilized()
+    machine = get_nodes_in_cluster()
+    print get_matching_instance_in_aws(machine)
