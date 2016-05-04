@@ -3,14 +3,10 @@
 """Prints system usage info. vCPU, Memory, and Storage
 
 """
-import pymongo
-from pymongo import MongoClient
 import platform, socket
-import psutil
-import sys
-import datetime
-import os
-import json
+import psutil, config
+from config import DB_NODE
+import sys, datetime, os, json
 
 """
 Retrieve memmory information
@@ -95,8 +91,7 @@ def insert_data():
     #Connect to MongoDB
 
     try:
-        client = MongoClient('130.238.29.106', 27017)
-        db = client['vm_nodes']
+        db = DB_NODE
         result = db.machines.insert_one(doc)
 
         #obj_id = result.inserted_id
