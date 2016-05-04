@@ -1,5 +1,5 @@
 from flask import Flask,request, render_template, jsonify
-import config, os, math, json
+import config, os, math, json, datetime
 from mapping import getMatchingInstanceInGCE, getMatchingInstanceInAWS, AWS_FLAVORS, GC_FLAVORS
 from computeCost import gce_price, aws_storage_prices, read_EC2_ondemand_instance_prices
 from config import DB_NODE as db, DB_REPORT as dr, NODE_COLLECTION as nc, REPORT_COLLECTION as rc
@@ -75,7 +75,7 @@ def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=5
 def load_data():
 
     #data_cursor = rc.find({'node':'aj-hadoop-master'}).skip(rc.find({'node':'aj-hadoop-master'}).count()-0)
-    data_cursor = rc.find({'node':'aj-hadoop-master'})
+    data_cursor = rc.find({'node':'aj-hadoop-master'}).limit(10)
     cpu_user = []
     mem_per = []
     disk_usage = []
@@ -136,7 +136,58 @@ def nodes():
     #my_keys = ['node','os','cpu', 'memory', 'disk']
     return render_template('nodes.html', data=machineList, ceil=ceil)
 
-    #return  page
+
+@app.route('/show_cluster_charts')
+def show_cluster_chart(chartID='chart_ID', chart_type='spline', chart_height=500, zoom_type='x'):
+
+    AGGR = [{"$group" : { "_id": { "$dateToString": { "format": "%Y-%m-%d %H:00", "date": "$dt" }},
+    "avgCPU": {"$avg": "$cpu.user"}, "avgMemory" :{ "$avg": "$memory"}, "avgDisk": {"$avg": "$disk"}}},
+    {"$sort": {"_id": 1}}]
+
+    data_cursor = rc.aggregate(AGGR)
+
+    cpu_user = []
+    mem_per = []
+    disk_usage = []
+    json_data = []
+    for data in data_cursor:
+        #json_data.append(data)
+        #if data['node'] == machine:
+        date = data['_id']
+        date_form = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M")
+        date_str = date_form.strftime('%b %d, %H:%M')
+        disk_usage.append([date_str, data['avgDisk']])
+        mem_per.append([date_str, data['avgMemory']])
+        cpu_user.append([date_str, data['avgCPU']])
+
+    text_title = "Resource Monitoring metrics on Cluster"
+    chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, "zoomType": zoom_type}
+    credits = { }
+    series = [
+        {"name": 'cpu',
+        "type": 'spline',
+        "data": cpu_user
+        }, {
+            "name" : 'memory',
+            "type": 'spline',
+            "data" :  mem_per
+        },
+        {
+            "name": 'disk',
+            "type": 'spline',
+            "data": disk_usage
+        }
+    ]
+    title = {"text": text_title}
+    xAxis = {"type": 'datetime',
+        "categories": [cpu_user[0]],
+        "tickInterval": 60
+    }
+    yAxis = {"title": {"text": 'Usage %'}}
+
+    return render_template('cluster_monitor.html', chartID=chartID, chart= chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
+
+
 if __name__ == '__main__':
 
     app.run(debug=True, host='0.0.0.0')

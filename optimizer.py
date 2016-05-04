@@ -29,20 +29,21 @@ def get_nodes_in_cluster():
 def get_max_memory_utilized(machine):
     mem_usage = 0
     mem_percent = 0
+    mem_size = get_memory_size(machine)
     #get the maximum cpu usage
     for max_mem in rc.find({"node":machine}, {"_id":0, "memory":1}).sort([("memory",-1)]).limit(1):
          mem_percent = max_mem['memory']
-    mem_usage = (mem_percent) /100 * (get_memory_size(machine))
-    return math.ceil(mem_usage)
+    return math.ceil((mem_percent) /100 * mem_size)
 
 def get_max_cpu_utilized(machine):
     cpu_usage = 0
     cpu_percent = 0
+    cpu_size = get_cpu_size(machine)
     #get the maximum cpu usage
     for max_cpu in rc.find({"node":machine}, {"_id":0, "cpu.user":1}).sort([("cpu.user",-1)]).limit(1):
          cpu_percent = max_cpu['cpu']['user']
-    cpu_usage = (cpu_percent/100 * get_cpu_size(machine))
-    return math.ceil(cpu_usage)
+
+    return math.ceil(cpu_percent/100 * cpu_size)
 
 def get_resources_utilized():
     machine_resources = dict()
@@ -68,7 +69,8 @@ def get_matching_instance_in_aws(doc):
 
 
 if __name__ == '__main__':
-    #print get_max_cpu_utilized("dev-node")
-    #machine = get_resources_utilized()
-    machine = get_nodes_in_cluster()
-    print get_matching_instance_in_aws(machine)
+    print get_max_cpu_utilized("dev-node")
+    machine = get_resources_utilized()
+    print machine
+    #machine = get_nodes_in_cluster()
+    #print get_matching_instance_in_aws(machine)
