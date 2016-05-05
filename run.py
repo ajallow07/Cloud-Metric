@@ -1,5 +1,7 @@
+#! /usr/bin/env python
+
 from flask import Flask,request, render_template, jsonify
-import config, os, math, json, datetime
+import config, os, math, json, datetime, optimizer
 from mapping import getMatchingInstanceInGCE, getMatchingInstanceInAWS, AWS_FLAVORS, GC_FLAVORS
 from computeCost import gce_price, aws_storage_prices, read_EC2_ondemand_instance_prices
 from config import DB_NODE as db, DB_REPORT as dr, NODE_COLLECTION as nc, REPORT_COLLECTION as rc
@@ -7,6 +9,9 @@ from jinja2 import Environment, FileSystemLoader
 from math import ceil
 from bson import json_util
 from bson.json_util import dumps
+from optimizer import get_nodes_in_cluster, get_matching_instance_in_gcp, get_matching_instance_in_aws
+
+
 
 app = Flask(__name__)
 
@@ -23,7 +28,7 @@ def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=5
     if rc.find(FILTER).count() < 600:
         data_cursor = rc.find(FILTER)
     else:
-        data_cursor = rc.find(FILTER).skip(rc.find(FILTER).count()-600)
+        data_cursor = rc.find(FILTER).skip(rc.find(FILTER).count()-800)
 
     cpu_user = []
     mem_per = []
@@ -187,6 +192,14 @@ def show_cluster_chart(chartID='chart_ID', chart_type='spline', chart_height=500
 
     return render_template('cluster_monitor.html', chartID=chartID, chart= chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
 
+@app.route('/recommender')
+def recommender():
+
+    nodes_in_cluster = get_nodes_in_cluster()
+    aws_recommended_instances = get_matching_instance_in_aws(nodes_in_cluster)
+    gcp_recommended_instances = get_matching_instance_in_gcp(nodes_in_cluster)
+
+    return render_template('recommendation.html', aws= aws_recommended_instances, gcp=gcp_recommended_instances)
 
 if __name__ == '__main__':
 

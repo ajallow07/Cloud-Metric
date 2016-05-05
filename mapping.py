@@ -108,3 +108,14 @@ def getMatchingInstanceInGCE(gceflavors, vcpu, memory):
         if flavor["mf"] == minimumDiff:
             matchingFavors.append(flavor['name'])
     return matchingFavors
+
+
+def averageCostOnGCP():
+
+
+    return 0
+
+def averageCostOnAWS():
+
+
+    return 0

@@ -1,0 +1,40 @@
+{% extends "index.html" %}
+{% block recommendation %}
+    <h2>Instances Recommendation </h2>
+    <p>Our optimizer has performed a resources scan on your cluster and
+      recommend that you use the following instances
+  on AWS and GCP for your cluster.</p>
+
+  <div id="rec1">
+    <table>
+        <tr><td>Instance Types on AWS</td> </tr>
+        {% if aws %}
+          {% for data in aws %}
+              {% if data|length > 1 %}
+              <tr><td>{{data[0]|upper}} or {{data[1]|upper}}</td> </tr>
+              {% else %}
+                <tr><td>{{data[0]|upper}}</td> </tr>
+              {% endif %}
+          {% endfor %}
+        {% endif %}
+    </table>
+  </div>
+  <div id="rec2">
+    <table>
+        <tr><td>Instance Types on GCP</td> </tr>
+        {% if gcp %}
+          {% for data in gcp %}
+            {% if data|length > 1 %}
+            <tr><td>{{data[0]}} or {{data[1]}}</td> </tr>
+            {% else %}
+              <tr><td>{{data[0]}}</td> </tr>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+    </table>
+  </div>
+  <div id="costs">
+      <p>Cost will be here....</p>
+  </div>
+
+{% endblock %}

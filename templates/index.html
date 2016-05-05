@@ -9,7 +9,8 @@
   <meta charset="utf-8" name="Cloud-Metric" content="Cloud Cost Estimation, Cost Estimator,
   Cost Estimation on Google Cloud and Amazon AWS, Framwork for Cloud Cost Estimation, Cloud applications cost estimation">
   <title>CLOUD-METRIC: Cost Effective Applications Development Framework for Cloud Insfrastructures </title>
-  <strong><link rel="stylesheet" href="/static/css/style.css?q=11" type="text/css" media="screen" charset="utf-8"></strong>
+  <strong><link rel="stylesheet" href="/static/css/style.css?q=ltt" type="text/css" media="screen" charset="utf-8"></strong>
+  <!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">-->
 </head>
 <body>
   <header>
@@ -20,8 +21,9 @@
         <ul class="menu">
           <li><a href="{{ url_for('home') }}">Home</a></li>
           <li><a href="{{ url_for('nodes') }}">Instances</a></li>
-          <li><a href="{{ url_for('awscost') }}">AWS Cost</a></li>
-          <li><a href="{{ url_for('gcecost') }}">Google Cloud Cost</a></li>
+          <li><a href="{{ url_for('awscost') }}">Monthly Cost on AWS</a></li>
+          <li><a href="{{ url_for('gcecost') }}">Monthy Cost on GCP</a></li>
+          <li><a href="{{ url_for('recommender') }}">Recommendation</a></li>
         </ul>
     </nav></strong>
       </div>
@@ -41,6 +43,12 @@
 
       {% endblock %}
     </div>
+    <div class="container">
+      {% block recommendation %}
+
+      {% endblock %}
+    </div>
+
 
     <footer class="ft">
         <div class="container">

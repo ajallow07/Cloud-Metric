@@ -196,13 +196,26 @@ body {
 .container tr:first-child td:last-child{
 	border-width:0px 0px 1px 1px;
 }
+.hide {
+  display: none;
+}
+
+#rec1 {
+    float: left;
+    width: 50%
+}
+
+#rec2{
+    float: right;
+    width: 50%
+}
   /*
   * Center the body content
   */
 .container {
   width:80%;
   margin:0 auto;
-  background-color:#dddddd;
+  background-color:#eee;
 }
 
 .jumbo {
@@ -215,7 +228,7 @@ body {
 }
 
 h2 {
-  font-size: 3em;
+  font-size: 2em;
   margin-top: 40px;
   text-align: center;
   letter-spacing: -2px;
