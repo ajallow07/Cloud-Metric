@@ -1,7 +1,6 @@
 {% extends "index.html" %}
 
 {% block instanceDetails %}
-  <p>Number of machines in your enviroment.</p>
 
   <table>
   <tr>
@@ -13,7 +12,8 @@
   <tr>
   {% for machine in data %}
   <tr>
-    <td>{{machine['node']}}&nbsp;&nbsp;&nbsp;<a href="{{url_for('show_charts', machine=machine['node'])}}">Monitor</a></td>
+    <td>{{machine['node']}}&nbsp;&nbsp;&nbsp;<a href="{{url_for('show_charts', machine=machine['node'])}}">Monitor</a>
+    &nbsp;&nbsp;&nbsp;<a href="{{url_for('show_costs', machine=machine['node'])}}">show costs</a></td>
     <td>{{machine['os']}}</td>
     <td>{{machine['cpu']|safe}}</td>
     <td>{{ '%0.0f' %(ceil((machine['memory']|float)))}}</td>
@@ -21,5 +21,43 @@
   </tr>
   {% endfor %}
   </table>
+{% endblock %}
+{% block AWSCosts %}
+<div class="" >
+  <h2>Monthly On-Demand Cost Estimates of Cluster on AWS</h2>
+  <p>The cost estimates for each of the instances takes US east region 1 (Virginia) as data center location. </p>
+  {% if data %}
+  <div class="prices" >
+  <table>
+    <tr><td>Node</td><td>Cost estimate per month</td></tr>
 
+    {% for (machine, price) in dataAWS %}
+
+      <tr><td>{{machine['node']}}</td><td>&#36;{{'%0.2f' % price}}</td></tr>
+
+    {% endfor %}
+  </table>
+  <p> <span>Total Estimated Cost of Cluster</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span><b>&#36;{{'%0.2f' %totalAWS}} / Month</b></span></p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block GCPCosts %}
+<div class="" >
+  <h2>Monthly On-Demand Cost Estimates of Cluster on GCP</h2>
+  <p>The cost estimates for each of the instances takes US region. </p>
+  {% if data %}
+  <div class="prices">
+  <table>
+    <tr><td>Node</td><td>Cost estimate per month</td></tr>
+    {% for (machine, price) in dataGCP %}
+      <tr><td>{{machine['node']}}</td><td>&#36;{{'%0.2f' %price}}</td></tr>
+    {% endfor %}
+
+  </table>
+  <p> <span>Total Estimated Cost of Cluster</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span><b>&#36;{{'%0.2f' %totalGCP}} / Month</b></span></p>
+  </div>
+  {% endif %}
+</div>
 {% endblock %}

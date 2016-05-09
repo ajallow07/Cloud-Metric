@@ -1,0 +1,34 @@
+{% extends "index.html" %}
+{% block AWSCosts %}
+{% if machine %}
+<div class="" >
+  <h2>Cost of {{machine}} in AWS regions</h2>
+  {% if data and awsregions %}
+  <table>
+    <tr><td>Region</td><td>Cost Estimate per Month</td></tr>
+    {% for region in  awsregions %}
+      <tr><td>{{region|upper}}</td><td>&#36;{{'%0.2f' %data[region]|float}}</td></tr>
+    {% endfor %}
+
+  </table>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block GCPCosts %}
+{% if machine %}
+<div class="" >
+  <h2>Cost of {{machine}} in GCP regions</h2>
+  {% if data and gcpregions %}
+  <table>
+    <tr><td>Region</td><td>Cost Estimate per Month</td></tr>
+    {% for region in  gcpregions %}
+      <tr><td>{{region|upper}}</td><td>&#36;{{'%0.2f' %data[region]|float}}</td></tr>
+    {% endfor %}
+
+  </table>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

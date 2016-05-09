@@ -20,21 +20,30 @@
           <nav>
         <ul class="menu">
           <li><a href="{{ url_for('home') }}">Home</a></li>
-          <li><a href="{{ url_for('nodes') }}">Instances</a></li>
-          <li><a href="{{ url_for('awscost') }}">Monthly Cost on AWS</a></li>
-          <li><a href="{{ url_for('gcecost') }}">Monthy Cost on GCP</a></li>
+          <li><a href="{{ url_for('nodes') }}">Instances &amp; Costs</a></li>
+          <li><a href="{{ url_for('show_cluster_chart') }}">Cluster Monitor</a></li>
           <li><a href="{{ url_for('recommender') }}">Recommendation</a></li>
         </ul>
     </nav></strong>
       </div>
   </header>
+  <div class="container">
+      {% block content %}
+
+      {% endblock %}
+  </div>
     <div class="container">
-        {% block content %}
+        {% block instanceDetails %}
 
         {% endblock %}
     </div>
     <div class="container">
-        {% block instanceDetails %}
+        {% block AWSCosts %}
+
+        {% endblock %}
+    </div>
+    <div class="container">
+        {% block GCPCosts %}
 
         {% endblock %}
     </div>

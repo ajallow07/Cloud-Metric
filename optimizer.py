@@ -67,6 +67,11 @@ def get_matching_instance_in_aws(doc):
         aws_instances.append(flavors)
     return aws_instances
 
+def get_cost_of_recommended_instances():
+
+    
+    return 0
+
 
 if __name__ == '__main__':
     print get_max_cpu_utilized("dev-node")
