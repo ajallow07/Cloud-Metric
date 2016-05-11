@@ -11,7 +11,7 @@ def read_EC2_ondemand_instance_prices(number, region, flavor, os):
 		os="linux"
 	if number <=0:
 		return 0
-	ifile  = open('../awspricingfull-master/EC2_OnDemand.csv', "r")
+	ifile  = open('EC2_OnDemand.csv', "r")
 
 	reader = csv.reader(ifile)
 
