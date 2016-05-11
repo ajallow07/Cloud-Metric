@@ -12,7 +12,6 @@ from bson.json_util import dumps
 from optimizer import get_nodes_in_cluster, get_matching_instance_in_gcp, get_matching_instance_in_aws
 
 
-
 app = Flask(__name__)
 
 # Define the template directory
@@ -245,7 +244,7 @@ def recommender():
     gcp_recommended_instances = get_matching_instance_in_gcp(nodes_in_cluster)
 
 
-    return render_template('recommendation.html', aws= aws_recommended_instances, gcp=gcp_recommended_instances)
+    return render_template('recommendation.html', aws=aws_recommended_instances, gcp=gcp_recommended_instances)
 
 if __name__ == '__main__':
 

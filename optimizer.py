@@ -61,17 +61,15 @@ def get_matching_instance_in_gcp(doc):
     return gcp_instances
 
 def get_matching_instance_in_aws(doc):
-    aws_instances =[]
+    aws_instances = []
     for machine in doc:
         flavors = getMatchingInstanceInAWS(AWS_FLAVORS, get_max_cpu_utilized(machine), get_max_memory_utilized(machine))
         aws_instances.append(flavors)
     return aws_instances
 
-def get_cost_of_recommended_instances():
+def get_cost_of_recommended_instances_on_AWS(ls):
 
-    
     return 0
-
 
 if __name__ == '__main__':
     print get_max_cpu_utilized("dev-node")

@@ -28,7 +28,7 @@ def read_EC2_ondemand_instance_prices(number, region, flavor, os):
 	ifile.close()
 
 	cost = float(unit_cost) * int(number)
-	total_price = cost * (((720*4) + (744*7) + (28*24*1))/12)
+	total_price = cost * (30.5 * 24)
 	return (total_price)
 #computes the monthly storage cost on AWS
 def aws_storage_prices(region, storage_size):
@@ -61,7 +61,7 @@ def gce_price(instances, vm_class, zone, machine_type, storage_size, os, ssd_num
 	local_SSD_cost = ssd_number * 81.75 * instances
 	vCPUs = 0
 	storage_cost = 0
-	average_monthly_hours = 720#(((720*4) + (744*7) + (28*24*1))/12)
+	average_monthly_hours = (30.5 * 24)#(((720*4) + (744*7) + (28*24*1))/12)
 	#get the number of vCPUs for instances not F1-MICRO and G1-SMALL
 	if machine_type!="F1-MICRO" and machine_type!="G1-SMALL":
 		vCPUs = int(re.search("(?<=\-)\d+", machine_type).group())
