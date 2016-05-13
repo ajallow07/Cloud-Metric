@@ -13,7 +13,6 @@ from optimizer import get_nodes_in_cluster, get_matching_instance_in_gcp, get_ma
 
 
 app = Flask(__name__)
-
 # Define the template directory
 #tpldir = os.path.dirname(os.path.abspath(__file__))+'/templates/'
 # Setup the template enviroment
@@ -48,7 +47,7 @@ def show_costs(machine):
     flavorGCP = getMatchingInstanceInGCE(GC_FLAVORS, specs[0]['cpu'], ceil(float(specs[0]['memory'])))
 
     for dataCenter in awsregions:
-        instanceCost = read_EC2_ondemand_instance_prices(1, dataCenter, flavorAWS[0], specs[0]['os'].lower())
+        instanceCost = read_EC2_ondemand_instance_prices(1, dataCenter, flavorAWS[0]['name'], specs[0]['os'].lower())
         storageCost = aws_storage_prices(dataCenter, ceil(float(specs[0]['disk'])))
         monthlyCost = instanceCost + storageCost
         dic = dict()
@@ -56,7 +55,7 @@ def show_costs(machine):
         regionCost.update(dic)
 
     for dataCenter in gcpregions:
-        instanceCost = gce_price(1,"regular", dataCenter, flavorGCP[0], ceil(float(specs[0]['disk'])), specs[0]['os'], 0)
+        instanceCost = gce_price(1,"regular", dataCenter, flavorGCP[0]['name'], ceil(float(specs[0]['disk'])), specs[0]['os'])
         dic = dict()
         dic[dataCenter] = instanceCost
         regionCost.update(dic)
@@ -129,36 +128,29 @@ def home():
 
     return render_template('home.html', vm = nodes)
 
-@app.route('/awscost')
-def awscost():
-    computedCost = []
-    machineList = [machine for machine in nc.find({},{'_id': False})]
+@app.route('/matchingAWSInstances/<machine>')
+def awsInstances(machine):
+    cloud = 'AWS'
+    machineList = [machine for machine in nc.find({"node":machine},{'_id': False})]
     totalCost = 0
-    for machine in machineList:
-        flavor = getMatchingInstanceInAWS(AWS_FLAVORS, machine['cpu'], ceil(float(machine['memory'])))
-        instanceCost = read_EC2_ondemand_instance_prices(1, "us-east-1", flavor[0], machine['os'].lower())
-        storageCost = aws_storage_prices("us-east-1", ceil(float(machine['disk'])))
-        monthlyCost = instanceCost + storageCost
-        totalCost += monthlyCost
-        computedCost.append(monthlyCost)
-    return render_template('getAWSCost.html', data=zip(machineList,computedCost), total=totalCost)
+
+    matchingFlavor = getMatchingInstanceInAWS(AWS_FLAVORS, machine['cpu'], ceil(float(machine['memory'])))
+
+    return render_template('matching_instances.html', data=matchingFlavor, cloudProvider =cloud)
 
 @app.route ('/nodecost')
 def nodecosts():
     return 'This show individual node cost'
 
 
-@app.route('/gcecost')
-def gcecost():
-    computedCost = []
-    machineList = [machine for machine in nc.find({},{'_id':False})]
-    totalCost = 0
-    for machine in machineList:
-        flavor = getMatchingInstanceInGCE(GC_FLAVORS, machine['cpu'], ceil(float(machine['memory'])))
-        instanceCost = gce_price(1,"regular", "us", flavor[0], ceil(float(machine['disk'])), machine['os'] , 0)
-        totalCost += instanceCost
-        computedCost.append(instanceCost)
-    return render_template('getGCCost.html', data=zip(machineList,computedCost), total=totalCost)
+@app.route('/matchingGCPInstances/<machine>')
+def gcpInstances(machine):
+    cloud = 'GCP'
+    machineList = [machine for machine in nc.find({"node":machine},{'_id': False})]
+
+    matchingFlavor = getMatchingInstanceInGCE(GC_FLAVORS, machine['cpu'], ceil(float(machine['memory'])))
+
+    return render_template('matching_instances.html', data=matchingFlavor, cloudProvider =cloud)
 
 @app.route('/nodes')
 def nodes():
@@ -170,13 +162,13 @@ def nodes():
     totalGCPCost = 0
     for machine in machineList:
         flavorGCP= getMatchingInstanceInGCE(GC_FLAVORS, machine['cpu'], ceil(float(machine['memory'])))
-        instanceCostGCP = gce_price(1,"regular", "us", flavorGCP[0], ceil(float(machine['disk'])), machine['os'] , 0)
+        instanceCostGCP = gce_price(1,"regular", "us", flavorGCP[0]['name'], ceil(float(machine['disk'])), machine['os'])
         totalGCPCost += instanceCostGCP
         computedGCPCost.append(instanceCostGCP)
 
 
         flavorAWS = getMatchingInstanceInAWS(AWS_FLAVORS, machine['cpu'], ceil(float(machine['memory'])))
-        instanceCostAWS = read_EC2_ondemand_instance_prices(1, "us-east-1", flavorAWS[0], machine['os'].lower())
+        instanceCostAWS = read_EC2_ondemand_instance_prices(1, "us-east-1", flavorAWS[0]['name'], machine['os'].lower())
         storageAWSCost = aws_storage_prices("us-east-1", ceil(float(machine['disk'])))
         monthlyCost = instanceCostAWS + storageAWSCost
         totalAWSCost += monthlyCost
@@ -242,7 +234,6 @@ def recommender():
     nodes_in_cluster = get_nodes_in_cluster()
     aws_recommended_instances = get_matching_instance_in_aws(nodes_in_cluster)
     gcp_recommended_instances = get_matching_instance_in_gcp(nodes_in_cluster)
-
 
     return render_template('recommendation.html', aws=aws_recommended_instances, gcp=gcp_recommended_instances)
 

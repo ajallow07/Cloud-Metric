@@ -13,7 +13,11 @@
   {% for machine in data %}
   <tr>
     <td>{{machine['node']}}&nbsp;&nbsp;&nbsp;<a href="{{url_for('show_charts', machine=machine['node'])}}">Monitor</a>
-    &nbsp;&nbsp;&nbsp;<a href="{{url_for('show_costs', machine=machine['node'])}}">show costs</a></td>
+    &nbsp;&nbsp;&nbsp;<a href="{{url_for('show_costs', machine=machine['node'])}}">show costs</a>
+
+
+  </td>
+
     <td>{{machine['os']}}</td>
     <td>{{machine['cpu']|safe}}</td>
     <td>{{ '%0.0f' %(ceil((machine['memory']|float)))}}</td>
@@ -33,7 +37,7 @@
 
     {% for (machine, price) in dataAWS %}
 
-      <tr><td>{{machine['node']}}</td><td>&#36;{{'%0.2f' % price}}</td></tr>
+      <tr><td>{{machine['node']}} &nbsp;&nbsp;&nbsp;<a href="{{url_for('awsInstances', machine=machine['node'])}}">matching AWS instances</a></td><td>&#36;{{'%0.2f' % price}}</td></tr>
 
     {% endfor %}
   </table>
@@ -52,7 +56,7 @@
   <table>
     <tr><td>Node</td><td>Cost estimate per month</td></tr>
     {% for (machine, price) in dataGCP %}
-      <tr><td>{{machine['node']}}</td><td>&#36;{{'%0.2f' %price}}</td></tr>
+      <tr><td>{{machine['node']}}&nbsp;&nbsp;&nbsp;<a href="{{url_for('gcpInstances', machine=machine['node'])}}">matching Machine Types</a></td><td>&#36;{{'%0.2f' %price}}</td></tr>
     {% endfor %}
 
   </table>

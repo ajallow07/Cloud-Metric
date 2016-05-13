@@ -1,0 +1,21 @@
+{% extends "index.html" %}
+{% block content %}
+<div class="" >
+  <h2></h2>
+  {% if data %}
+  <p>The instances are the closest matching machines on {{cloudProvider}}</p>
+
+  <div class="prices">
+  <table>
+    <tr><td>Instance Name</td><td>vCPUs</td><td>Memory (GB)</td></tr>
+    {% for machine in data %}
+
+      <tr><td>{{machine['name']}}</td><td>{{machine['param']['vCPU']}}</td><td>{{machine['param']['memory']}}</td></tr>
+
+    {% endfor %}
+  </table>
+
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

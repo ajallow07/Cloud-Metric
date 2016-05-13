@@ -32,7 +32,7 @@ def read_EC2_ondemand_instance_prices(number, region, flavor, os):
 	return (total_price)
 #computes the monthly storage cost on AWS
 def aws_storage_prices(region, storage_size):
-
+	'''
 	config = json.loads(open("pricing-storage-s3.json").read())
 	storage_cost = 0
 	monthly_Storage_Cost = 0
@@ -46,21 +46,21 @@ def aws_storage_prices(region, storage_size):
 			break
 
 	#print storage_cost
-
-	return float(storage_cost) * int(storage_size)
+	'''
+	return float(0.045) * int(storage_size)
 		#print region['region'], region['tiers'][0]['storageTypes'][0]['prices']['USD']
 	#print monthly_Storage_Cost
 
 #computes the an estimated mponthly cost of running instances on google cloud
-def gce_price(instances, vm_class, zone, machine_type, storage_size, os, ssd_number):
+def gce_price(instances, vm_class, zone, machine_type, storage_size, os):
 
 	config = json.loads(open("Google pricelist.json").read())
 	sustained_use_discount = 0.7
 	flavor_hourly_cost = config['gcp_price_list']['CP-COMPUTEENGINE-VMIMAGE-'+machine_type][zone]
 	paid_os_cost= 0
-	local_SSD_cost = ssd_number * 81.75 * instances
+	#local_SSD_cost = ssd_number * 81.75 * instances
 	vCPUs = 0
-	storage_cost = 0
+	pd_storage_cost = storage_size * float(config['gcp_price_list']['CP-COMPUTEENGINE-STORAGE-PD-CAPACITY']['us'])
 	average_monthly_hours = (30.5 * 24)#(((720*4) + (744*7) + (28*24*1))/12)
 	#get the number of vCPUs for instances not F1-MICRO and G1-SMALL
 	if machine_type!="F1-MICRO" and machine_type!="G1-SMALL":
@@ -89,11 +89,10 @@ def gce_price(instances, vm_class, zone, machine_type, storage_size, os, ssd_num
 	if vm_class == "preemtible":
 		monthly_cost = (instances * float(flavor_hourly_cost) * average_monthly_hours)
 	else:
-		monthly_cost = (instances * float(flavor_hourly_cost)*average_monthly_hours) * sustained_use_discount
+		monthly_cost = (instances * float(flavor_hourly_cost) * average_monthly_hours) * sustained_use_discount
 
+	total_monthly_cost = (monthly_cost + paid_os_cost)
 
-	total_monthly_cost = (monthly_cost + local_SSD_cost + paid_os_cost)
+	total_vms_monthly_cost = pd_storage_cost + total_monthly_cost
 
-	storage_cost = storage_size * float(config['gcp_price_list']["CP-BIGSTORE-STORAGE"]['us'])
-	total_vms_monthly_cost = storage_cost + total_monthly_cost
 	return total_vms_monthly_cost

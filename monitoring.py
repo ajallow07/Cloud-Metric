@@ -5,7 +5,7 @@ Monitoring cpu, memory, disk, and network resources
 
 """
 from datetime import datetime
-import psutil
+import psutil, sys,time
 import pymongo
 from pymongo import MongoClient
 import socket
@@ -19,7 +19,9 @@ var_disk = psutil.disk_usage(first_mnt).percent
 
 """
 
-def main():
+def main(ip):
+
+    SECRET_KEY = 'Put your secret key here'
 
     cpu = psutil.cpu_times_percent()
     disk_root = psutil.disk_usage('/')
@@ -37,7 +39,7 @@ def main():
     }
 
     try:
-        conn = MongoClient('130.238.29.106', 27017)
+        conn = MongoClient(ip, 27017)
         db = conn.reports
         result = db.resources.insert_one(doc)
         conn.close()
@@ -46,7 +48,11 @@ def main():
         print "Could not insert data to db: "+str(e)
 
 if __name__ == '__main__':
-    import time
+    
+    if len(sys.argv) < 2:
+        print "Error, Usage: python monitoring.py [MongoDB IP] &"
+        sys.exit()
+
     while True:
-        main()
-        time.sleep(60) # pause for 30 seconds
+        main(sys.argv[1])
+        time.sleep(60) # pause for 60 seconds

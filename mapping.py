@@ -75,20 +75,18 @@ GC_FLAVORS = [   {"name":"F1-MICRO" , "param": {"vCPU": 1, "memory": 0.60},"mf":
             ]
 
 def getMatchingInstanceInAWS(awsflavors, vcpu, memory):
-    for flavor in awsflavors:
-        #get the absolute differences in vCPU and memory usages
-        flavor['mf'] = abs(vcpu-flavor['param']['vCPU']) + abs(memory - flavor['param']['memory'])
-
     matchingFavors = []
     minimumDiff = 10000
 
     for flavor in awsflavors:
+        #get the absolute differences in vCPU and memory usages
+        flavor['mf'] = abs(vcpu-flavor['param']['vCPU']) + abs(memory - flavor['param']['memory'])
         if flavor['mf'] < minimumDiff:
             minimumDiff = flavor['mf']
 
     for flavor in awsflavors:
         if flavor["mf"] == minimumDiff:
-            matchingFavors.append(flavor['name'])
+            matchingFavors.append(flavor)
 
     return matchingFavors
 
@@ -104,7 +102,7 @@ def getMatchingInstanceInGCE(gceflavors, vcpu, memory):
 
     for flavor in gceflavors:
         if flavor["mf"] == minimumDiff:
-            matchingFavors.append(flavor['name'])
+            matchingFavors.append(flavor)
     return matchingFavors
 
 

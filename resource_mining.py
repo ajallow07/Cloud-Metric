@@ -1,16 +1,16 @@
  #! /usr/bin/env python
 
-"""Prints system usage info. vCPU, Memory, and Storage
-
-"""
 import platform, socket
-import psutil, config
-from config import DB_NODE
+import psutil
 import sys, datetime, os, json
+import pymongo
+from pymongo import MongoClient
+
 
 """
 Retrieve memmory information
 """
+
 def bytes_to_human(n):
     # >>> bytes2human(10000)
     # '9.8K'
@@ -74,6 +74,18 @@ def detect_ncpus():
         return 1
 
 def insert_data():
+
+    if len(sys.argv) < 2:
+        print "Error, Usage: ./resource_mining.py [MongoDB IP]"
+        sys.exit()
+
+    SECRET_KEY = 'Put your secret key here'
+    VM_DB = 'vm_nodes'
+    REPORT_DB = 'reports'
+    DB_NODE = MongoClient(sys.argv[1], 27017)[VM_DB]
+    NODE_COLLECTION = DB_NODE.machines
+
+
 #   returns a json object
     #MEMORY_SIZE = get_total_memory(psutil.virtual_memory())
     #DISK_SIZE = get_block_storage()
