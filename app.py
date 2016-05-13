@@ -194,8 +194,8 @@ def show_cluster_chart(chartID='chart_ID', chart_type='spline', chart_height=500
     for data in data_cursor:
         #json_data.append(data)
         #if data['node'] == machine:
-        date = data['_id']
-        date_form = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M")
+
+        date_form = datetime.datetime.strptime(data['_id'], "%Y-%m-%d %H:%M")
         date_str = date_form.strftime('%b %d, %H:%M')
         disk_usage.append([date_str, data['avgDisk']])
         mem_per.append([date_str, data['avgMemory']])
