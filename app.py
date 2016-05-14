@@ -12,7 +12,14 @@ from bson.json_util import dumps
 from optimizer import get_nodes_in_cluster, get_matching_instance_with_PD_OS, get_cost_of_recommended_instances_on_AWS, get_cost_of_recommended_instances_on_GCP
 
 
+
 app = Flask(__name__)
+'''
+client = MongoClient(
+    os.environ['DB_PORT_27017_TCP_ADDR'],
+    27017)
+db = client.tododb
+'''
 # Define the template directory
 #tpldir = os.path.dirname(os.path.abspath(__file__))+'/templates/'
 # Setup the template enviroment
