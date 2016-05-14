@@ -13,7 +13,7 @@
   {% for machine in data %}
   <tr>
     <td>{{machine['node']}}&nbsp;&nbsp;&nbsp;<a href="{{url_for('show_charts', machine=machine['node'])}}">Monitor</a>
-    &nbsp;&nbsp;&nbsp;<a href="{{url_for('show_costs', machine=machine['node'])}}">show costs</a>
+    &nbsp;&nbsp;&nbsp;<a href="{{url_for('show_costs', machine=machine['node'])}}">Cost in All Regions</a>
 
 
   </td>
