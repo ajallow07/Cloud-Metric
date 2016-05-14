@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import csv
 import sys
 import json
@@ -47,7 +46,8 @@ def aws_storage_prices(region, storage_size):
 
 	#print storage_cost
 	'''
-	return float(0.045) * int(storage_size)
+	#uses magnetic volumes pricing
+	return float(0.050) * int(storage_size)
 		#print region['region'], region['tiers'][0]['storageTypes'][0]['prices']['USD']
 	#print monthly_Storage_Cost
 
@@ -84,7 +84,6 @@ def gce_price(instances, vm_class, zone, machine_type, storage_size, os):
 			paid_os_cost = instances * float(config['gcp_price_list']['CP-COMPUTEENGINE-OS'][os]['low'])* average_monthly_hours
 		else:
 			paid_os_cost = instances * vCPUs * float(config['gcp_price_list']['CP-COMPUTEENGINE-OS'][os]['high']) * average_monthly_hours
-
 
 	if vm_class == "preemtible":
 		monthly_cost = (instances * float(flavor_hourly_cost) * average_monthly_hours)

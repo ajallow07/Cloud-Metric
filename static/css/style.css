@@ -200,12 +200,12 @@ body {
   display: none;
 }
 
-#rec1 {
+.rec1 {
     float: left;
     width: 50%
 }
 
-#rec2{
+.rec2{
     float: right;
     width: 50%
 }

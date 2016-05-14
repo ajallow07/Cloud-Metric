@@ -9,7 +9,7 @@ from jinja2 import Environment, FileSystemLoader
 from math import ceil
 from bson import json_util
 from bson.json_util import dumps
-from optimizer import get_nodes_in_cluster, get_matching_instance_in_gcp, get_matching_instance_in_aws
+from optimizer import get_nodes_in_cluster, get_matching_instance_with_PD_OS, get_cost_of_recommended_instances_on_AWS, get_cost_of_recommended_instances_on_GCP
 
 
 app = Flask(__name__)
@@ -232,10 +232,13 @@ def show_cluster_chart(chartID='chart_ID', chart_type='spline', chart_height=500
 def recommender():
 
     nodes_in_cluster = get_nodes_in_cluster()
-    aws_recommended_instances = get_matching_instance_in_aws(nodes_in_cluster)
-    gcp_recommended_instances = get_matching_instance_in_gcp(nodes_in_cluster)
+    gcp_instances, aws_instances = get_matching_instance_with_PD_OS(nodes_in_cluster)
 
-    return render_template('recommendation.html', aws=aws_recommended_instances, gcp=gcp_recommended_instances)
+    gceCostData, totalGCPCost = get_cost_of_recommended_instances_on_GCP(gcp_instances)
+    awsCostData, totalAWSCost = get_cost_of_recommended_instances_on_AWS(aws_instances)
+
+    return render_template('recommendation.html', aws=aws_instances,
+    gcp=gcp_instances, awsData=awsCostData, gcpData=gceCostData, awstotal=totalAWSCost, gcptotal=totalGCPCost)
 
 if __name__ == '__main__':
 
