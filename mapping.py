@@ -52,7 +52,8 @@ AWS_FLAVORS = [{"name": "t2.nano", "param" :{"vCPU": 1,"memory": 0.5}, "mf": 0},
                 {"name":"d2.2xlarge", "param": {"vCPU":8,"memory": 61},"mf": 0},
                 {"name":"d2.4xlarge", "param": {"vCPU":16,"memory": 122},"mf": 0},
                 {"name":"d2.8xlarge", "param": {"vCPU": 22,"memory": 244},"mf": 0}
-                ]
+
+            ]
 
 GC_FLAVORS = [   {"name":"F1-MICRO" , "param": {"vCPU": 1, "memory": 0.60},"mf": 0},
                 {"name":"G1-SMALL" , "param": {"vCPU": 1, "memory": 1.70},"mf": 0},
@@ -74,9 +75,10 @@ GC_FLAVORS = [   {"name":"F1-MICRO" , "param": {"vCPU": 1, "memory": 0.60},"mf":
                 {"name":"N1-HIGHCPU-32", "param": {"vCPU": 32, "memory": 28.80},"mf": 0}
             ]
 
+
 def getMatchingInstanceInAWS(awsflavors, vcpu, memory):
     matchingFavors = []
-    minimumDiff = 10000
+    minimumDiff = float('Inf')
 
     for flavor in awsflavors:
         #get the absolute differences in vCPU and memory usages
@@ -86,13 +88,24 @@ def getMatchingInstanceInAWS(awsflavors, vcpu, memory):
 
     for flavor in awsflavors:
         if flavor["mf"] == minimumDiff:
-            matchingFavors.append(flavor)
+            if flavor['param']['vCPU'] == vcpu:
+                matchingFavors.append(flavor)
+
+            else:
+                #Not a desired match, consider tradeoff, get next match
+                flavor['mf'] = float('Inf')
+                minimumDiff = float('Inf')
+                #update the minimumDiff
+                for machine in awsflavors:
+                    if machine['mf'] < minimumDiff:
+                        minimumDiff = machine['mf']
+
 
     return matchingFavors
 
 def getMatchingInstanceInGCE(gceflavors, vcpu, memory):
     matchingFavors = []
-    minimumDiff = 10000
+    minimumDiff = float('Inf')
 
     for flavor in gceflavors:
         #get the absolute differences in vCPU and memory usages
@@ -102,16 +115,32 @@ def getMatchingInstanceInGCE(gceflavors, vcpu, memory):
 
     for flavor in gceflavors:
         if flavor["mf"] == minimumDiff:
-            matchingFavors.append(flavor)
+            if flavor['param']['vCPU'] == vcpu:
+                matchingFavors.append(flavor)
+
+            else:
+                #Not a desired match, consider tradeoff, get next match
+                flavor['mf'] = float('Inf')
+                minimumDiff = float('Inf')
+                #update the minimumDiff
+                for machine in gceflavors:
+                    if machine['mf'] < minimumDiff:
+                        minimumDiff = machine['mf']
+
     return matchingFavors
 
+def updateMatchingFactors(data, minDiff):
+    #Find the the match
+    for machine in data:
+        if minDiff == machine['mf']:
+            machine['mf'] = float('Inf')
+            minDiff = float('Inf')
 
-def averageCostOnGCP():
+    for machine in data:
+        if machine['mf'] < minDiff:
+            minDiff = machine['mf']
 
 
-    return 0
+if __name__ == '__main__':
 
-def averageCostOnAWS():
-
-
-    return 0
+    print getMatchingInstanceInGCE(GC_FLAVORS, 8, 16)

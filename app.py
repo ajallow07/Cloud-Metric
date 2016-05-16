@@ -77,7 +77,7 @@ def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=5
     if rc.find(FILTER).count() < 600:
         data_cursor = rc.find(FILTER)
     else:
-        data_cursor = rc.find(FILTER).skip(rc.find(FILTER).count()-800)
+        data_cursor = rc.find(FILTER).skip(rc.find(FILTER).count() - 800)
 
     cpu_user = []
     mem_per = []
