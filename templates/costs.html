@@ -2,7 +2,7 @@
 {% block AWSCosts %}
 {% if machine %}
 <div class="" >
-  <h2>Cost of {{machine}} in AWS regions</h2>
+  <h2>Cost Estimate of "{{machine}}" in AWS regions</h2>
   {% if data and awsregions %}
   <table>
     <tr><td>Region</td><td>Cost Estimate per Month</td></tr>
@@ -19,7 +19,7 @@
 {% block GCPCosts %}
 {% if machine %}
 <div class="" >
-  <h2>Cost of {{machine}} in GCP regions</h2>
+  <h2>Cost Estimate of "{{machine}}" in GCP regions</h2>
   {% if data and gcpregions %}
   <table>
     <tr><td>Region</td><td>Cost Estimate per Month</td></tr>

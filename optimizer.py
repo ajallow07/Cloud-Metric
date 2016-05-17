@@ -5,7 +5,7 @@ import math
 import mapping, computeCost
 from computeCost import read_EC2_ondemand_instance_prices, aws_storage_prices, gce_price
 from mapping import getMatchingInstanceInGCE, getMatchingInstanceInAWS, AWS_FLAVORS, GC_FLAVORS
-from config import DB_NODE as db, DB_REPORT as dr, NODE_COLLECTION as nc, REPORT_COLLECTION as rc
+from config import NODE_COLLECTION as nc, REPORT_COLLECTION as rc
 #Node for support of  multi cluster , we will need cluster Id identification
 
 
@@ -17,10 +17,10 @@ def get_machine_resources(machine):
         os = resource['os']
     return cpu, memory, disk, os
 
-def get_nodes_in_cluster():
+def get_nodes_in_cluster(cluster):
     machines_in_cluster = []
     #get_node_name = function(doc) { return doc.node }
-    for machine in nc.find({}, {"node":1,"_id":0}):
+    for machine in nc.find({"cluster_id":cluster}, {"node":1,"_id":0}):
         machines_in_cluster.append(machine['node'])
     return machines_in_cluster
 
@@ -63,11 +63,14 @@ def get_matching_instance_with_PD_OS(doc):
     for machine in doc:
         max_cpu, max_memory, disk, os = get_max_resources_utilized(machine)
 
-        flavors = getMatchingInstanceInGCE(GC_FLAVORS, max_cpu, max_memory)
-        gcp_instances.append([flavors[0]['name'], disk, os])
+        flavorsGCP = getMatchingInstanceInGCE(GC_FLAVORS, max_cpu, max_memory)
+        if flavorsGCP:
+            gcp_instances.append([flavorsGCP[0]['name'], disk, os])
 
-        flavors = getMatchingInstanceInAWS(AWS_FLAVORS, max_cpu, max_memory)
-        aws_instances.append([flavors[0]['name'], disk, os])
+        flavorsAWS = getMatchingInstanceInAWS(AWS_FLAVORS, max_cpu, max_memory)
+        
+        if flavorsAWS:
+            aws_instances.append([flavorsAWS[0]['name'], disk, os])
 
     return gcp_instances, aws_instances
 

@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 
-from flask import Flask,request, render_template, jsonify
+from flask import Flask,request, render_template, jsonify, session
 import config, os, math, json, datetime, optimizer
 from mapping import getMatchingInstanceInGCE, getMatchingInstanceInAWS, AWS_FLAVORS, GC_FLAVORS
 from computeCost import gce_price, aws_storage_prices, read_EC2_ondemand_instance_prices
-from config import DB_NODE as db, DB_REPORT as dr, NODE_COLLECTION as nc, REPORT_COLLECTION as rc
+from config import NODE_COLLECTION as nc, REPORT_COLLECTION as rc, CLUSTER_COLLECTION as cc
 from jinja2 import Environment, FileSystemLoader
 from math import ceil
 from bson import json_util
@@ -14,6 +14,8 @@ from optimizer import get_nodes_in_cluster, get_matching_instance_with_PD_OS, ge
 
 
 app = Flask(__name__)
+
+app.secret_key = 'F12Zr47j\3yX R~X@H!jmM]Lwf/,?KT'
 '''
 client = MongoClient(
     os.environ['DB_PORT_27017_TCP_ADDR'],
@@ -31,7 +33,7 @@ db = client.tododb
 @app.route('/show_costs/<machine>')
 def show_costs(machine):
 
-    if machine not in get_nodes_in_cluster():
+    if not machine:
 
         return render_template("costs.html", machine=None, awsregions= '', gcpregions='', data='');
 
@@ -129,11 +131,17 @@ def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=5
 def load_data():
 
     return ''
+
 @app.route('/')
 def home():
-    nodes = nc.count()
 
-    return render_template('home.html', vm = nodes)
+    cNames = []
+    clusterCount = cc.count()
+    if clusterCount > 0:
+
+        cNames = [cluster['name'] for cluster in cc.find({},{'_id':0, 'name':1})]
+        session['cluster'] = cNames[0]
+    return render_template('home.html', clusterNumber=clusterCount, clusterNames=cNames, session=session)
 
 @app.route('/matchingAWSInstances/<machine>')
 def awsInstances(machine):
@@ -159,9 +167,10 @@ def gcpInstances(machine):
 
     return render_template('matching_instances.html', data=matchingFlavor, cloudProvider =cloud)
 
-@app.route('/nodes')
-def nodes():
-    machineList= [machine for machine in nc.find({},{'_id':False})]
+@app.route('/nodes/<cluster>')
+def nodes(cluster):
+    session['cluster'] = cluster
+    machineList = [machine for machine in nc.find({"cluster_id":cluster},{'_id':False})]
     #my_keys = ['node','os','cpu', 'memory', 'disk']
     computedAWSCost = []
     computedGCPCost = []
@@ -182,13 +191,14 @@ def nodes():
         computedAWSCost.append(monthlyCost)
 
     return render_template('nodes.html', data=machineList, ceil=ceil, dataAWS=zip(machineList,computedAWSCost),
-    totalAWS=totalAWSCost, totalGCP=totalGCPCost, dataGCP= zip(machineList,computedGCPCost))
+    totalAWS=totalAWSCost, totalGCP=totalGCPCost, dataGCP= zip(machineList,computedGCPCost), session=session)
 
 
-@app.route('/show_cluster_charts')
-def show_cluster_chart(chartID='chart_ID', chart_type='spline', chart_height=500, zoom_type='x'):
+@app.route('/show_cluster_charts/<cluster>')
+def show_cluster_chart(cluster, chartID='chart_ID', chart_type='spline', chart_height=500, zoom_type='x'):
 
-    AGGR = [{"$group" : { "_id": { "$dateToString": { "format": "%Y-%m-%d %H:00", "date": "$dt" }},
+    AGGR = [{ "$match": { "cluster_id": cluster }},
+    {"$group" : { "_id": { "$dateToString": { "format": "%Y-%m-%d %H:00", "date": "$dt" }},
     "avgCPU": {"$avg": "$cpu.user"}, "avgMemory" :{ "$avg": "$memory"}, "avgDisk": {"$avg": "$disk"}}},
     {"$sort": {"_id": 1}}]
 
@@ -235,14 +245,24 @@ def show_cluster_chart(chartID='chart_ID', chart_type='spline', chart_height=500
 
     return render_template('cluster_monitor.html', chartID=chartID, chart= chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
 
-@app.route('/recommender')
-def recommender():
+@app.route('/recommender/<cluster>')
+def recommender(cluster):
+    gcp_instances =[]
+    aws_instances =[]
+    gceCostData =[]
+    totalGCPCost=0
+    awsCostData =[]
+    totalAWSCost=0
 
-    nodes_in_cluster = get_nodes_in_cluster()
-    gcp_instances, aws_instances = get_matching_instance_with_PD_OS(nodes_in_cluster)
+    nodes_in_cluster = get_nodes_in_cluster(cluster)
+    if nodes_in_cluster:
+        gcp_instances, aws_instances = get_matching_instance_with_PD_OS(nodes_in_cluster)
 
-    gceCostData, totalGCPCost = get_cost_of_recommended_instances_on_GCP(gcp_instances)
-    awsCostData, totalAWSCost = get_cost_of_recommended_instances_on_AWS(aws_instances)
+    if not (len(nodes_in_cluster) > len(gcp_instances)):
+        gceCostData, totalGCPCost = get_cost_of_recommended_instances_on_GCP(gcp_instances)
+
+    if not (len(nodes_in_cluster) > len(aws_instances)):
+        awsCostData, totalAWSCost = get_cost_of_recommended_instances_on_AWS(aws_instances)
 
     return render_template('recommendation.html', aws=aws_instances,
     gcp=gcp_instances, awsData=awsCostData, gcpData=gceCostData, awstotal=totalAWSCost, gcptotal=totalGCPCost)

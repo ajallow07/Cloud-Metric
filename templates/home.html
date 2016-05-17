@@ -1,9 +1,18 @@
 {% extends "index.html" %}
 {% block content %}
   <div class="jumbo">
-    <h2>Number of Nodes in your environment: {{vm}}<h2>
-    {% if vm > 0 %}
-      <strong> <a href="nodes">show nodes</a></strong>
+
+    <h2>Welcome to CLOUD-METRIC!</h2>
+    {% if clusterNumber > 0 %}
+    <h3>You have registered <b>{{clusterNumber}}</b> cluster(s)</h3>
+    {% endif %}
+
+    {% if clusterNames %}
+    <ul>
+      {% for node in clusterNames %}
+      <li><strong><a href="{{url_for('nodes',cluster=node)}}">cluster {{loop.index}}</a></strong></li>
+      {% endfor %}
+    </ul>
     {% endif %}
   </div>
 

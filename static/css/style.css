@@ -235,12 +235,11 @@ h2 {
 }
 
 h3 {
-  font-size: 1.7em;
-  font-weight: 100;
+  font-size: 1.9em;
   margin-top: 30px;
+  font-family: serif;
   text-align: center;
   letter-spacing: -1px;
-  color: #999;
 }
 
 .prices {
@@ -258,15 +257,21 @@ h3 {
   margin-top: 8px;
 }
 
-.menu li {
+.container li {
   display: inline;
+  text-align: center;
+  
+}
+.menu li{
+  display: inline;
+
 }
 
-.menu li + li {
+.menu li + li{
   margin-left: 35px;
 }
 
-.menu li a {
+.menu li a, .container li a{
   color: #999;
   text-decoration: none;
 }

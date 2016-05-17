@@ -76,35 +76,56 @@ def detect_ncpus():
 def insert_data():
 
     if len(sys.argv) < 2:
-        print "Error, Usage: ./resource_mining.py [MongoDB IP]"
+        print "Error, Usage: python resource_mining.py [MongoDB IP]"
         sys.exit()
 
-    SECRET_KEY = 'Put your secret key here'
-    VM_DB = 'vm_nodes'
-    REPORT_DB = 'reports'
-    DB_NODE = MongoClient(sys.argv[1], 27017)[VM_DB]
-    NODE_COLLECTION = DB_NODE.machines
-
-
-#   returns a json object
-    #MEMORY_SIZE = get_total_memory(psutil.virtual_memory())
-    #DISK_SIZE = get_block_storage()
-    #vCPU_COUNT = detect_ncpus()
-    doc = dict()
-    doc['node'] = socket.gethostname()
-    doc['os'] = platform.system()
-    doc['cpu'] = detect_ncpus()
-    doc['memory'] = get_total_memory(psutil.virtual_memory())
-    doc['disk'] = get_block_storage()
-
-    #values = {'node': NODE, 'os': OS, 'cpu': vCPU_COUNT, 'memory': MEMORY_SIZE, 'disk': DISK_SIZE}
-    #print vCPU_COUNT
-    #print values
-    #Connect to MongoDB
-
     try:
-        db = DB_NODE
-        result = db.machines.insert_one(doc)
+        CLUSTER_KEY = 'hadoop_cluster'
+        CM_DB = 'cloud_metric_data'
+        db = MongoClient(sys.argv[1], 27017)[CM_DB]
+
+        if 'clusters' not in db.collection_names():
+            db.create_collection(
+                           'clusters',
+                           capped=False,
+
+                        )
+        #checks if cluster_key was inserted
+        if CLUSTER_KEY not in [node['name'] for node in db.clusters.find({},{'_id':0,'name':1})]:
+            cluster_doc = dict()
+            cluster_doc['name'] = CLUSTER_KEY
+            db.clusters.insert_one(cluster_doc)
+            db.clusters.create_index('name',unique=True)
+
+        #checks for collection name in db
+        if 'metered_data' not in db.collection_names():
+            db.create_collection(
+                       'metered_data',
+                        capped=False
+                    )
+
+
+
+    #   returns a json object
+        #MEMORY_SIZE = get_total_memory(psutil.virtual_memory())
+        #DISK_SIZE = get_block_storage()
+        #vCPU_COUNT = detect_ncpus()
+        doc = dict()
+        doc['cluster_id'] = CLUSTER_KEY
+        doc['node'] = socket.gethostname()
+        doc['os'] = platform.system()
+        doc['cpu'] = detect_ncpus()
+        doc['memory'] = get_total_memory(psutil.virtual_memory())
+        doc['disk'] = get_block_storage()
+
+        #values = {'node': NODE, 'os': OS, 'cpu': vCPU_COUNT, 'memory': MEMORY_SIZE, 'disk': DISK_SIZE}
+        #print vCPU_COUNT
+        #print values
+        #Connect to MongoDB
+        if socket.gethostname() not in [resources['node'] for resources in db.metered_data.find({},{'_id':0, 'node':1})]:
+            db.metered_data.insert_one(doc)
+            db.metered_data.create_index('node',unique=True)
+
 
         #obj_id = result.inserted_id
         #print obj_id
