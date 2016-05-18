@@ -195,7 +195,7 @@ def nodes(cluster):
 
 
 @app.route('/show_cluster_charts/<cluster>')
-def show_cluster_chart(cluster, chartID='chart_ID', chart_type='spline', chart_height=500, zoom_type='x'):
+def show_cluster_chart(cluster, chartID='chart_ID', chart_type='spline', chart_height=500, zoom_type='xy'):
 
     AGGR = [{ "$match": { "cluster_id": cluster }},
     {"$group" : { "_id": { "$dateToString": { "format": "%Y-%m-%d %H:00", "date": "$dt" }},
@@ -218,7 +218,7 @@ def show_cluster_chart(cluster, chartID='chart_ID', chart_type='spline', chart_h
         mem_per.append([date_str, data['avgMemory']])
         cpu_user.append([date_str, data['avgCPU']])
 
-    text_title = "Resource Monitoring metrics on Cluster"
+    text_title = "Resource Monitoring metrics on "+str(session['cluster'])+ " cluster"
     chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, "zoomType": zoom_type}
     credits = { }
     series = [
@@ -241,7 +241,7 @@ def show_cluster_chart(cluster, chartID='chart_ID', chart_type='spline', chart_h
         "categories": [cpu_user[0]],
         "tickInterval": 60
     }
-    yAxis = {"title": {"text": 'Usage %'}}
+    yAxis = {"title": {"text": 'Utilization %'}}
 
     return render_template('cluster_monitor.html', chartID=chartID, chart= chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
 
@@ -258,11 +258,11 @@ def recommender(cluster):
     if nodes_in_cluster:
         gcp_instances, aws_instances = get_matching_instance_with_PD_OS(nodes_in_cluster)
 
-    if not (len(nodes_in_cluster) > len(gcp_instances)):
-        gceCostData, totalGCPCost = get_cost_of_recommended_instances_on_GCP(gcp_instances)
+    #if not (len(nodes_in_cluster) > len(gcp_instances)):
+    gceCostData, totalGCPCost = get_cost_of_recommended_instances_on_GCP(gcp_instances)
 
-    if not (len(nodes_in_cluster) > len(aws_instances)):
-        awsCostData, totalAWSCost = get_cost_of_recommended_instances_on_AWS(aws_instances)
+    #if not (len(nodes_in_cluster) > len(aws_instances)):
+    awsCostData, totalAWSCost = get_cost_of_recommended_instances_on_AWS(aws_instances)
 
     return render_template('recommendation.html', aws=aws_instances,
     gcp=gcp_instances, awsData=awsCostData, gcpData=gceCostData, awstotal=totalAWSCost, gcptotal=totalGCPCost)

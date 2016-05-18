@@ -26,19 +26,38 @@ def get_nodes_in_cluster(cluster):
 
 def get_max_resources_utilized(machine):
     cpu_percent = 0
+    optimizedCPU = 0
+    optimizedMem = 0
     percent_val = 100
+    #time_horizon = 48 #2 days of of resources utilization
     mem_percent = 0
     #disk_percent = 0
     cpu_size, mem_size, disk_size, os = get_machine_resources(machine)
-    #highest cpu usage over time
-    for max_cpu in rc.find({"node":machine}, {"_id":0, "cpu.user":1}).sort([("cpu.user",-1)]).limit(1):
-         cpu_percent = max_cpu['cpu']['user']
+
+    avg_CPU_And_Mem_Utilization = [{ "$group": {"_id": { "node": machine},
+    "avgCPU": {"$avg": "$cpu.user"}, "avgMemory" :{ "$avg": "$memory"}}}]
+
+    #average CPU and Memory Utilication over time
+    for avg in rc.aggregate(avg_CPU_And_Mem_Utilization):
+        cpu_percent = avg['avgCPU']
+        mem_percent = avg['avgMemory']
+
+    #find({"node":machine}, {"_id":0, "cpu.user":1}).sort([("cpu.user",-1)]).limit(1):
     #highest memory usage over time period
-    for max_mem in rc.find({"node":machine}, {"_id":0, "memory":1}).sort([("memory",-1)]).limit(1):
-         mem_percent = max_mem['memory']
+    #for max_mem in rc.find({"node":machine}, {"_id":0, "memory":1}).sort([("memory",-1)]).limit(1):
+          #mem_percent = max_mem['memory']
 
-    return math.ceil(cpu_percent/percent_val * cpu_size), math.ceil((mem_percent) /percent_val * mem_size), math.ceil(disk_size), os
+    optimizedCPU = math.ceil(cpu_percent/percent_val * cpu_size)
+    optimizedMem = math.ceil((mem_percent)/percent_val * mem_size)
 
+    #handle cpu not a power of 2
+    expVal = math.log(optimizedCPU, 2)
+    if (expVal - int(expVal)) > 0:
+        optimizedCPU = int(2**math.ceil(math.log(optimizedCPU,2)))
+
+    return optimizedCPU, optimizedMem, math.ceil(disk_size), os
+
+#retrieve matching instance on AWS and GCP based on the usage data
 def get_matching_instance_in_providers(doc):
 
     gcp_instances = []
@@ -55,12 +74,12 @@ def get_matching_instance_in_providers(doc):
 
     return gcp_instances, aws_instances
 
-def get_matching_instance_with_PD_OS(doc):
+def get_matching_instance_with_PD_OS(cluster):
 
     gcp_instances = []
     aws_instances = []
 
-    for machine in doc:
+    for machine in cluster:
         max_cpu, max_memory, disk, os = get_max_resources_utilized(machine)
 
         flavorsGCP = getMatchingInstanceInGCE(GC_FLAVORS, max_cpu, max_memory)
@@ -68,7 +87,7 @@ def get_matching_instance_with_PD_OS(doc):
             gcp_instances.append([flavorsGCP[0]['name'], disk, os])
 
         flavorsAWS = getMatchingInstanceInAWS(AWS_FLAVORS, max_cpu, max_memory)
-        
+
         if flavorsAWS:
             aws_instances.append([flavorsAWS[0]['name'], disk, os])
 
@@ -76,10 +95,12 @@ def get_matching_instance_with_PD_OS(doc):
 
 def get_cost_of_recommended_instances_on_AWS(recommendedInstances):
     recommendedInstancesAndCost = []
+    defaultRegion = 'us-east-1'
     totalCost = 0
     for instance in recommendedInstances:
-        instanceCost = read_EC2_ondemand_instance_prices(1, 'us-east-1', instance[0], instance[2])
-        persistentDiskCost = aws_storage_prices('us-east-1', instance[1])
+        instanceCost = read_EC2_ondemand_instance_prices(1, defaultRegion, instance[0], instance[2].lower())
+        persistentDiskCost = aws_storage_prices(defaultRegion, instance[1])
+
         totalInstanceCost = instanceCost + persistentDiskCost
         totalCost += totalInstanceCost
         recommendedInstancesAndCost.append([instance[0], totalInstanceCost])
@@ -87,20 +108,21 @@ def get_cost_of_recommended_instances_on_AWS(recommendedInstances):
     return recommendedInstancesAndCost, totalCost
 
 def get_cost_of_recommended_instances_on_GCP(recommendedInstances):
-
+    defaultRegion = 'us'
+    vm_class = 'regular'
     recommendedInstancesAndCost = []
     totalCost = 0
 
     for instance in recommendedInstances:
-        instanceCost = gce_price(1,'regular', 'us', instance[0], instance[1], instance[2])
-        totalCost += instanceCost
-
-        recommendedInstancesAndCost.append([instance[0], instanceCost])
+        instanceCost = gce_price(1, vm_class ,defaultRegion , instance[0], instance[1], instance[2])
+        if instanceCost:
+            totalCost += instanceCost
+            recommendedInstancesAndCost.append([instance[0], instanceCost])
 
     return recommendedInstancesAndCost, totalCost
 
-
 if __name__ == '__main__':
-
-    machine = get_nodes_in_cluster()
-    print get_cost_of_recommended_instances_on_GCP(get_matching_instance_with_PD_OS(machine)[0])
+    aws = get_matching_instance_with_PD_OS(get_nodes_in_cluster('hadoop'))[1]
+    print aws
+    print gce_price(1, 'regular' ,'us' , 'F1-MICRO', 79, 'linux')
+    print get_cost_of_recommended_instances_on_AWS(aws)

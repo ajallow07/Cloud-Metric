@@ -23,8 +23,8 @@
           <li><a href="{{ url_for('home') }}">Home</a></li>
           {% if session %}
           <li><a href="{{ url_for('show_cluster_chart', cluster=session['cluster'])}}">Cluster Monitor</a></li>
-          <li><a href="{{ url_for('nodes', cluster=session['cluster'])}}">Instances &amp; Costs</a></li>
-          <li><a href="{{ url_for('recommender', cluster=session['cluster'])}}">Recommendation</a></li>-->
+          <li><a href="{{ url_for('nodes', cluster=session['cluster'])}}">Cost Estimates</a></li>
+          <li><a href="{{ url_for('recommender', cluster=session['cluster'])}}">Recommendation</a></li>
           {% endif %}
         </ul>
     </nav></strong>
