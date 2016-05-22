@@ -17,7 +17,7 @@ app = Flask(__name__)
 
 app.secret_key = 'F12Zr47j\3yX R~X@H!jmM]Lwf/,?KT'
 
-
+session['cluster'] = None
 # Define the template directory
 #tpldir = os.path.dirname(os.path.abspath(__file__))+'/templates/'
 # Setup the template enviroment
