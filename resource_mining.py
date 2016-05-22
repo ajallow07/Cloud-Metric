@@ -16,15 +16,15 @@ def bytes_to_human(n):
     # '9.8K'
     # >>> bytes2human(100001221)
     # '95.4M'
-    symbols = ('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
+    symbols = ('G')
     prefix = {}
     for i, s in enumerate(symbols):
-        prefix[s] = 1 << (i + 1) * 10
+        prefix[s] = 1 << (i + 3) * 10
     for s in reversed(symbols):
-        if n >= prefix[s]:
-            value = float(n) / prefix[s]
-            return '%.1f' % (value)
-    return "%s" % n
+        #if n >= prefix[s]:
+        value = float(n) / prefix[s]
+        return '%.1f' % (value)
+    return "%s" %n
 
 
 def get_total_memory(nt):
@@ -80,32 +80,29 @@ def insert_data():
         sys.exit()
 
     try:
-        CLUSTER_KEY = 'hadoop_cluster'
-        CM_DB = 'cloud_metric_data'
+        CLUSTER_KEY = 'Hadoop'
+        CM_DB = 'Node_Data'
         db = MongoClient(sys.argv[1], 27017)[CM_DB]
-
-        if 'clusters' not in db.collection_names():
+        '''
+        if "clusters" not in db.collection_names():
             db.create_collection(
                            'clusters',
-                           capped=False,
-
-                        )
+                           capped=False)
+        '''
         #checks if cluster_key was inserted
         if CLUSTER_KEY not in [node['name'] for node in db.clusters.find({},{'_id':0,'name':1})]:
             cluster_doc = dict()
             cluster_doc['name'] = CLUSTER_KEY
-            db.clusters.insert_one(cluster_doc)
+            db.clusters.insert(cluster_doc)
             db.clusters.create_index('name',unique=True)
-
+        '''
         #checks for collection name in db
-        if 'metered_data' not in db.collection_names():
+        if "metered_data" not in db.collection_names():
             db.create_collection(
                        'metered_data',
                         capped=False
                     )
-
-
-
+        '''
     #   returns a json object
         #MEMORY_SIZE = get_total_memory(psutil.virtual_memory())
         #DISK_SIZE = get_block_storage()
@@ -123,9 +120,8 @@ def insert_data():
         #print values
         #Connect to MongoDB
         if socket.gethostname() not in [resources['node'] for resources in db.metered_data.find({},{'_id':0, 'node':1})]:
-            db.metered_data.insert_one(doc)
+            db.metered_data.insert(doc)
             db.metered_data.create_index('node',unique=True)
-
 
         #obj_id = result.inserted_id
         #print obj_id

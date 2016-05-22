@@ -41,8 +41,8 @@
 
         {% endfor %}
       {% endif %}
-      <tr><td><b>Total Cost</b></td> <td><b>&#36;{{'%0.2f' %awstotal|float}}</b></td></tr>
   </table>
+  <p> <span><b>Total Estimated Cost</b></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span><b>&#36;{{'%0.2f' %awstotal|float}} / Month</b></span></p>
 </div>
 <div class="rec2">
   <table>
@@ -53,8 +53,8 @@
           <td>&#36;{{'%0.2f' %data[1]|float}}</td> </tr>
         {% endfor %}
       {% endif %}
-      <tr><td><b>Total Cost</b></td> <td><b>&#36;{{'%0.2f' %gcptotal|float}}</b></td></tr>
   </table>
+    <p> <span><b>Total Estimated Cost</b></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span><b>&#36;{{'%0.2f' %gcptotal|float}} / Month</b></span></p>
 </div>
 
 {% endblock %}

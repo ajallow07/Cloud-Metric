@@ -21,7 +21,7 @@ var_disk = psutil.disk_usage(first_mnt).percent
 
 def main(ip):
 
-    CLUSTER_KEY = 'hadoop_cluster' #provide the cluster_key
+    CLUSTER_KEY = 'Hadoop' #provide the cluster_key
 
     cpu = psutil.cpu_times_percent()
     disk_root = psutil.disk_usage('/')
@@ -41,16 +41,11 @@ def main(ip):
 
     try:
 
-        CM_DB = 'cloud_metric_data'
+        CM_DB = 'Node_Data'
         db = MongoClient(sys.argv[1], 27017)[CM_DB]
         #check for collection name in db
-        if 'resources_usage_data' not in db.collection_names():
-            db.create_collection(
-                        'resources_usage_data',
-                        capped=True,
-                        size = 117964800, # two days of monitoring data for 20 nodes recorded every minute
-                        max=57600 #max number of records
-                        )
+        #if "resources_usage_data" not in db.collection_names():
+        #    db.create_collection('resources_usage_data',capped=True,size = 117964800, max=57600)
 
         db.resources_usage_data.insert(doc)
 
@@ -63,6 +58,6 @@ if __name__ == '__main__':
         print "Error, Usage: python monitoring.py [MongoDB IP] &"
         sys.exit()
 
-    #while True:
-    main(sys.argv[1])
-        #time.sleep(60) # pause for 60 seconds
+    while True:
+        main(sys.argv[1])
+        time.sleep(60) # pause for 60 seconds

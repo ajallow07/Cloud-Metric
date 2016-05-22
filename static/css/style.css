@@ -121,7 +121,11 @@ body {
 	border-top-left-radius:12px;
 
 }
+.logo a{
+  text-decoration: none;
+  color: #eee;
 
+}
 .container tr:last-child td:last-child {
   -moz-border-radius-bottomright:14px;
 	-webkit-border-bottom-right-radius:14px;
@@ -237,7 +241,6 @@ h2 {
 h3 {
   font-size: 1.9em;
   margin-top: 30px;
-  font-family: serif;
   text-align: center;
   letter-spacing: -1px;
 }
@@ -260,7 +263,7 @@ h3 {
 .container li {
   display: inline;
   text-align: center;
-  
+
 }
 .menu li{
   display: inline;

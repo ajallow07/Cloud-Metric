@@ -16,12 +16,8 @@ from optimizer import get_nodes_in_cluster, get_matching_instance_with_PD_OS, ge
 app = Flask(__name__)
 
 app.secret_key = 'F12Zr47j\3yX R~X@H!jmM]Lwf/,?KT'
-'''
-client = MongoClient(
-    os.environ['DB_PORT_27017_TCP_ADDR'],
-    27017)
-db = client.tododb
-'''
+
+
 # Define the template directory
 #tpldir = os.path.dirname(os.path.abspath(__file__))+'/templates/'
 # Setup the template enviroment
@@ -117,10 +113,14 @@ def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=5
         ]
         title = {"text": text_title}
         xAxis = {"type": 'datetime',
-            "categories": [cpu_user[0]],
+            "categories": [cpu_user[0][0]],
             "tickInterval": 60
         }
-        yAxis = {"title": {"text": 'Usage %'}}
+        yAxis = {
+            "title": {"text": 'Usage %'},
+            "ceiling": 100,
+            "floor": 0
+            }
 
         return render_template('graphs.html', chartID=chartID, chart= chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
 
@@ -140,7 +140,8 @@ def home():
     if clusterCount > 0:
 
         cNames = [cluster['name'] for cluster in cc.find({},{'_id':0, 'name':1})]
-        session['cluster'] = cNames[0]
+        if session['cluster'] == None:
+            session['cluster'] = cNames[0]
     return render_template('home.html', clusterNumber=clusterCount, clusterNames=cNames, session=session)
 
 @app.route('/matchingAWSInstances/<machine>')
@@ -220,30 +221,37 @@ def show_cluster_chart(cluster, chartID='chart_ID', chart_type='spline', chart_h
 
     text_title = "Resource Monitoring metrics on "+str(session['cluster'])+ " cluster"
     chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, "zoomType": zoom_type}
-    credits = { }
-    series = [
-        {"name": 'cpu',
-        "type": 'spline',
-        "data": cpu_user
-        }, {
-            "name" : 'memory',
-            "type": 'spline',
-            "data" :  mem_per
-        },
-        {
-            "name": 'disk',
-            "type": 'spline',
-            "data": disk_usage
-        }
-    ]
-    title = {"text": text_title}
-    xAxis = {"type": 'datetime',
-        "categories": [cpu_user[0]],
-        "tickInterval": 60
-    }
-    yAxis = {"title": {"text": 'Utilization %'}}
+    credits = {}
 
-    return render_template('cluster_monitor.html', chartID=chartID, chart= chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
+    if cpu_user:
+        series = [
+            {"name": 'cpu',
+            "type": 'spline',
+            "data": cpu_user
+            }, {
+                "name" : 'memory',
+                "type": 'spline',
+                "data" :  mem_per
+            },
+            {
+                "name": 'disk',
+                "type": 'spline',
+                "data": disk_usage
+            }
+        ]
+        title = {"text": text_title}
+        xAxis = {"type": 'datetime',
+            "categories": [cpu_user[0][0]],
+            "tickInterval": 60
+        }
+        yAxis = {"title": {"text": 'Utilization %'},
+        "ceiling": 100,
+        "floor": 0
+        }
+
+        return render_template('cluster_monitor.html', chartID=chartID, chart= chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
+
+    return render_template('cluster_monitor.html', chartID=chartID, chart=chart, series=[], title="Resource Monitoring", xAxis={}, yAxis={})
 
 @app.route('/recommender/<cluster>')
 def recommender(cluster):

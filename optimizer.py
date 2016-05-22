@@ -122,7 +122,4 @@ def get_cost_of_recommended_instances_on_GCP(recommendedInstances):
     return recommendedInstancesAndCost, totalCost
 
 if __name__ == '__main__':
-    aws = get_matching_instance_with_PD_OS(get_nodes_in_cluster('hadoop'))[1]
-    print aws
-    print gce_price(1, 'regular' ,'us' , 'F1-MICRO', 79, 'linux')
-    print get_cost_of_recommended_instances_on_AWS(aws)
+    print get_max_resources_utilized("aj-hadoop-slave-1")
