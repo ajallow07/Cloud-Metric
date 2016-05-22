@@ -70,7 +70,7 @@ def show_costs(machine):
 @app.route('/show_charts/<machine>')
 def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=500, zoom_type='x'):
     FILTER = {'node': machine}
-    if rc.find(FILTER).count() < 600:
+    if rc.find(FILTER).count() < 800:
         data_cursor = rc.find(FILTER)
     else:
         data_cursor = rc.find(FILTER).skip(rc.find(FILTER).count() - 800)

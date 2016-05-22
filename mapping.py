@@ -75,60 +75,6 @@ GC_FLAVORS = [   {"name":"F1-MICRO" , "param": {"vCPU": 1, "memory": 0.60},"mf":
                 {"name":"N1-HIGHCPU-32", "param": {"vCPU": 32, "memory": 28.80},"mf": 0}
             ]
 
-'''
-def getMatchingInstanceInAWS(awsflavors, vcpu, memory):
-    matchingFavors = []
-    minimumDiff = float('Inf')
-
-    for flavor in awsflavors:
-        #get the absolute differences in vCPU and memory usages
-        flavor['mf'] = abs(vcpu-flavor['param']['vCPU']) + abs(memory - flavor['param']['memory'])
-        if flavor['mf'] < minimumDiff:
-            minimumDiff = flavor['mf']
-
-    for flavor in awsflavors:
-        if flavor["mf"] == minimumDiff:
-            if flavor['param']['vCPU'] == vcpu:
-                matchingFavors.append(flavor)
-
-            else:
-                #Not a desired match, consider tradeoff, get next match
-                flavor['mf'] = float('Inf')
-                minimumDiff = float('Inf')
-                #update the minimumDiff
-                for machine in awsflavors:
-                    if machine['mf'] < minimumDiff:
-                        minimumDiff = machine['mf']
-
-
-    return matchingFavors
-
-def getMatchingInstanceInGCE(gceflavors, vcpu, memory):
-    matchingFavors = []
-    minimumDiff = float('Inf')
-
-    for flavor in gceflavors:
-        #get the absolute differences in vCPU and memory usages
-        flavor['mf'] = abs(vcpu-flavor['param']['vCPU']) + abs(memory - flavor['param']['memory'])
-        if flavor['mf'] < minimumDiff:
-            minimumDiff = flavor['mf']
-
-    for flavor in gceflavors:
-        if flavor["mf"] == minimumDiff:
-            if flavor['param']['vCPU'] == vcpu:
-                matchingFavors.append(flavor)
-
-            else:
-                #Not a desired match, consider tradeoff, get next match
-                flavor['mf'] = float('Inf')
-                minimumDiff = float('Inf')
-                #update the minimumDiff
-                for machine in gceflavors:
-                    if machine['mf'] < minimumDiff:
-                        minimumDiff = machine['mf']
-
-    return matchingFavors
-'''
 def getMatchingInstances(data, cpu, mem):
     #Find the the match
     matchingFavors = []
@@ -145,7 +91,3 @@ def getMatchingInstances(data, cpu, mem):
         if memDiff == machine['mf']:
             matchingFavors.append(machine)
     return matchingFavors
-
-if __name__ == '__main__':
-
-    print getMatchingInstances(AWS_FLAVORS,8,20)

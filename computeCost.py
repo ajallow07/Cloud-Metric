@@ -54,7 +54,7 @@ def aws_storage_prices(region, storage_size):
 #computes the an estimated mponthly cost of running instances on google cloud
 def gce_price(instances, vm_class, zone, machine_type, storage_size, os):
 
-	config = json.loads(open("Google pricelist.json").read())
+	config = json.loads(open("Google_pricelist.json").read())
 	sustained_use_discount = 0.7
 	flavor_hourly_cost = config['gcp_price_list']['CP-COMPUTEENGINE-VMIMAGE-'+machine_type][zone]
 	paid_os_cost= 0
@@ -63,6 +63,7 @@ def gce_price(instances, vm_class, zone, machine_type, storage_size, os):
 	pd_storage_cost = storage_size * float(config['gcp_price_list']['CP-COMPUTEENGINE-STORAGE-PD-CAPACITY']['us'])
 	average_monthly_hours = (30.5 * 24)#(((720*4) + (744*7) + (28*24*1))/12)
 	#get the number of vCPUs for instances not F1-MICRO and G1-SMALL
+
 	if machine_type!="F1-MICRO" and machine_type!="G1-SMALL":
 		vCPUs = int(re.search("(?<=\-)\d+", machine_type).group())
 
