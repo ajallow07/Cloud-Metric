@@ -138,7 +138,7 @@ def home():
     if clusterCount > 0:
 
         cNames = [cluster['name'] for cluster in cc.find({},{'_id':0, 'name':1})]
-        if not session['cluster']:
+        if not session.has_key('cluster'):
             session['cluster'] = cNames[0]
     return render_template('home.html', clusterNumber=clusterCount, clusterNames=cNames, session=session)
 
