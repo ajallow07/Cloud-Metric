@@ -16,8 +16,6 @@ from optimizer import get_nodes_in_cluster, get_matching_instance_with_PD_OS, ge
 app = Flask(__name__)
 
 app.secret_key = 'F12Zr47j\3yX R~X@H!jmM]Lwf/,?KT'
-
-session['cluster'] = None
 # Define the template directory
 #tpldir = os.path.dirname(os.path.abspath(__file__))+'/templates/'
 # Setup the template enviroment
@@ -140,7 +138,7 @@ def home():
     if clusterCount > 0:
 
         cNames = [cluster['name'] for cluster in cc.find({},{'_id':0, 'name':1})]
-        if session['cluster'] == None:
+        if not session['cluster']:
             session['cluster'] = cNames[0]
     return render_template('home.html', clusterNumber=clusterCount, clusterNames=cNames, session=session)
 
