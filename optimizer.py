@@ -4,18 +4,22 @@ import config
 import math
 import mapping, computeCost
 from computeCost import read_EC2_ondemand_instance_prices, aws_storage_prices, gce_price
-from mapping import getMatchingInstanceInGCE, getMatchingInstanceInAWS, AWS_FLAVORS, GC_FLAVORS
+from mapping import getMatchingInstances, AWS_FLAVORS, GC_FLAVORS
 from config import NODE_COLLECTION as nc, REPORT_COLLECTION as rc
 #Node for support of  multi cluster , we will need cluster Id identification
 
 
 def get_machine_resources(machine):
+    vcpu = 0
+    mem = 0
+    strg = 0
+    opsys = ''
     for resource in nc.find({"node":machine}, {"cpu":1,"memory":1, "disk":1, "os":1, "_id":0}):
-        cpu = resource['cpu']
-        memory = float(resource['memory'])
-        disk = float(resource['disk'])
-        os = resource['os']
-    return cpu, memory, disk, os
+        vcpu = resource['cpu']
+        mem = float(resource['memory'])
+        strg = float(resource['disk'])
+        opsys = resource['os']
+    return vcpu, mem, strg, opsys
 
 def get_nodes_in_cluster(cluster):
     machines_in_cluster = []
@@ -51,9 +55,10 @@ def get_max_resources_utilized(machine):
     optimizedMem = math.ceil((mem_percent)/percent_val * mem_size)
 
     #handle cpu not a power of 2
-    expVal = math.log(optimizedCPU, 2)
-    if (expVal - int(expVal)) > 0:
-        optimizedCPU = int(2**math.ceil(math.log(optimizedCPU,2)))
+    if optimizedCPU > 0:
+        expVal = math.log(optimizedCPU, 2)
+        if (expVal - int(expVal)) > 0:
+            optimizedCPU = int(2**math.ceil(math.log(optimizedCPU,2)))
 
     return optimizedCPU, optimizedMem, math.ceil(disk_size), os
 
@@ -82,11 +87,11 @@ def get_matching_instance_with_PD_OS(cluster):
     for machine in cluster:
         max_cpu, max_memory, disk, os = get_max_resources_utilized(machine)
 
-        flavorsGCP = getMatchingInstanceInGCE(GC_FLAVORS, max_cpu, max_memory)
+        flavorsGCP = getMatchingInstances(GC_FLAVORS, max_cpu, max_memory)
         if flavorsGCP:
             gcp_instances.append([flavorsGCP[0]['name'], disk, os])
 
-        flavorsAWS = getMatchingInstanceInAWS(AWS_FLAVORS, max_cpu, max_memory)
+        flavorsAWS = getMatchingInstances(AWS_FLAVORS, max_cpu, max_memory)
 
         if flavorsAWS:
             aws_instances.append([flavorsAWS[0]['name'], disk, os])
@@ -122,4 +127,8 @@ def get_cost_of_recommended_instances_on_GCP(recommendedInstances):
     return recommendedInstancesAndCost, totalCost
 
 if __name__ == '__main__':
+    print get_machine_resources('aj-hadoop-slave-1')
     print get_max_resources_utilized("aj-hadoop-slave-1")
+    print get_max_resources_utilized("aj-hadoop-slave-2")
+
+    print get_matching_instance_with_PD_OS("Test")

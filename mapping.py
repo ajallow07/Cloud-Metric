@@ -75,7 +75,7 @@ GC_FLAVORS = [   {"name":"F1-MICRO" , "param": {"vCPU": 1, "memory": 0.60},"mf":
                 {"name":"N1-HIGHCPU-32", "param": {"vCPU": 32, "memory": 28.80},"mf": 0}
             ]
 
-
+'''
 def getMatchingInstanceInAWS(awsflavors, vcpu, memory):
     matchingFavors = []
     minimumDiff = float('Inf')
@@ -128,19 +128,24 @@ def getMatchingInstanceInGCE(gceflavors, vcpu, memory):
                         minimumDiff = machine['mf']
 
     return matchingFavors
-
-def updateMatchingFactors(data, minDiff):
+'''
+def getMatchingInstances(data, cpu, mem):
     #Find the the match
+    matchingFavors = []
+    memDiff = float('Inf')
+    cpuMatchingInstances= []
     for machine in data:
-        if minDiff == machine['mf']:
-            machine['mf'] = float('Inf')
-            minDiff = float('Inf')
+        if machine['param']['vCPU'] == cpu:
+            machine['mf'] = abs(mem - machine['param']['memory'])
+            if machine['mf'] <  memDiff:
+                memDiff = machine['mf']
+            cpuMatchingInstances.append(machine)
 
-    for machine in data:
-        if machine['mf'] < minDiff:
-            minDiff = machine['mf']
-
+    for machine in cpuMatchingInstances:
+        if memDiff == machine['mf']:
+            matchingFavors.append(machine)
+    return matchingFavors
 
 if __name__ == '__main__':
 
-    print getMatchingInstanceInGCE(GC_FLAVORS, 8, 16)
+    print getMatchingInstances(AWS_FLAVORS,8,20)
