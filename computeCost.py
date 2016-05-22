@@ -1,16 +1,18 @@
 #!/usr/bin/env python
-import csv
+import csv, os
 import sys
 import json
 import re
 
 #computes the estimated monthly prices of running AWS instances
-def read_EC2_ondemand_instance_prices(number, region, flavor, os):
-	if os == "darwin" or os=="POSIX":
-		os="linux"
+
+def read_EC2_ondemand_instance_prices(number, region, flavor, ops):
+	AWS_DATA = os.path.abspath('EC2_OnDemand.csv')
+	if ops == "darwin" or os=="POSIX":
+		ops="linux"
 	if number <=0:
 		return 0
-	ifile  = open('EC2_OnDemand.csv', "r")
+	ifile  = open(AWS_DATA, "r")
 
 	reader = csv.reader(ifile)
 
@@ -19,7 +21,7 @@ def read_EC2_ondemand_instance_prices(number, region, flavor, os):
 	for row in reader:
 
 	    if rownum != 0:
-	    	if row[0]==region and row[1] ==flavor and row[2]==os:
+	    	if row[0]==region and row[1] ==flavor and row[2]==ops:
 		    	unit_cost = row[3]
 		     	break
 
@@ -52,9 +54,9 @@ def aws_storage_prices(region, storage_size):
 	#print monthly_Storage_Cost
 
 #computes the an estimated mponthly cost of running instances on google cloud
-def gce_price(instances, vm_class, zone, machine_type, storage_size, os):
-
-	config = json.loads(open("Google_pricelist.json").read())
+def gce_price(instances, vm_class, zone, machine_type, storage_size, ops):
+	GC_DATA = os.path.abspath('Google_pricelist.json')
+	config = json.loads(open(GC_DATA).read())
 	sustained_use_discount = 0.7
 	flavor_hourly_cost = config['gcp_price_list']['CP-COMPUTEENGINE-VMIMAGE-'+machine_type][zone]
 	paid_os_cost= 0
@@ -69,20 +71,20 @@ def gce_price(instances, vm_class, zone, machine_type, storage_size, os):
 
 	#gets the cost of paid operating systems on gc compute engine,
 	#such as win, suse, and rhel
-	if os == "rhel":
+	if ops == "rhel":
 		if vCPUs <= 4:
-			paid_os_cost = instances* float(config['gcp_price_list']['CP-COMPUTEENGINE-OS'][os]['low'])* average_monthly_hours
+			paid_os_cost = instances* float(config['gcp_price_list']['CP-COMPUTEENGINE-OS'][ops]['low'])* average_monthly_hours
 		else:
-			paid_os_cost = instances * float(config['gcp_price_list']['CP-COMPUTEENGINE-OS'][os]['high'])* average_monthly_hours
-	if os == "suse":
+			paid_os_cost = instances * float(config['gcp_price_list']['CP-COMPUTEENGINE-OS'][ops]['high'])* average_monthly_hours
+	if ops== "suse":
 		if machine_type == "F1-MICRO" or machine_type=="G1-SMALL":
-			paid_os_cost = instances * float(config['gcp_price_list']['CP-COMPUTEENGINE-OS'][os]['low'])* average_monthly_hours
+			paid_os_cost = instances * float(config['gcp_price_list']['CP-COMPUTEENGINE-OS'][ops]['low'])* average_monthly_hours
 		else:
-			paid_os_cost = instances* float(config['gcp_price_list']['CP-COMPUTEENGINE-OS'][os]['high'])*average_monthly_hours
+			paid_os_cost = instances* float(config['gcp_price_list']['CP-COMPUTEENGINE-OS'][ops]['high'])*average_monthly_hours
 
-	if os == "win":
+	if ops == "win":
 		if machine_type == "F1-MICRO" or machine_type=="G1-SMALL":
-			paid_os_cost = instances * float(config['gcp_price_list']['CP-COMPUTEENGINE-OS'][os]['low'])* average_monthly_hours
+			paid_os_cost = instances * float(config['gcp_price_list']['CP-COMPUTEENGINE-OS'][ops]['low'])* average_monthly_hours
 		else:
 			paid_os_cost = instances * vCPUs * float(config['gcp_price_list']['CP-COMPUTEENGINE-OS'][os]['high']) * average_monthly_hours
 
