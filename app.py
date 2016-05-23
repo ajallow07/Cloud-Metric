@@ -10,7 +10,7 @@ from math import ceil
 from bson import json_util
 from bson.json_util import dumps
 from optimizer import get_nodes_in_cluster, get_matching_instance_with_PD_OS, get_cost_of_recommended_instances_on_AWS, get_cost_of_recommended_instances_on_GCP
-
+from operator import itemgetter, attrgetter
 
 
 app = Flask(__name__)
@@ -31,7 +31,8 @@ def show_costs(machine):
 
         return render_template("costs.html", machine=None, awsregions= '', gcpregions='', data='');
 
-    regionCost = dict()
+    regionCostAWS = []
+    regionCostGCP = []
     awsregions = [
     "us-east-1",
     "us-west-1",
@@ -52,28 +53,32 @@ def show_costs(machine):
     for dataCenter in awsregions:
         instanceCost = read_EC2_ondemand_instance_prices(1, dataCenter, flavorAWS[0]['name'], specs[0]['os'].lower())
         storageCost = aws_storage_prices(dataCenter, ceil(float(specs[0]['disk'])))
+
         monthlyCost = instanceCost + storageCost
-        dic = dict()
-        dic[dataCenter] = monthlyCost
-        regionCost.update(dic)
+        #dic.(dataCenter, monthlyCost)
+        if instanceCost > 0:
+            regionCostAWS.append((dataCenter, monthlyCost))
+
+    sortedRegionCostOnAWS = sorted(regionCostAWS, key= itemgetter(1))
 
     for dataCenter in gcpregions:
         instanceCost = gce_price(1,"regular", dataCenter, flavorGCP[0]['name'], ceil(float(specs[0]['disk'])), specs[0]['os'])
-        dic = dict()
-        dic[dataCenter] = instanceCost
-        regionCost.update(dic)
+        if instanceCost > 0:
+            regionCostGCP.append((dataCenter, instanceCost))
 
-    return render_template("costs.html", machine=machine, awsregions= awsregions, gcpregions=gcpregions, data=regionCost);
+    sortedRegionCostOnGCP = sorted(regionCostGCP, key= itemgetter(1))
+
+    return render_template("costs.html", machine=machine, awsregions= sortedRegionCostOnAWS, gcpregions=sortedRegionCostOnGCP);
 
 
 #monitoring aspect
 @app.route('/show_charts/<machine>')
 def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=500, zoom_type='x'):
     FILTER = {'node': machine}
-    if rc.find(FILTER).count() < 800:
+    if rc.find(FILTER).count() < 600:
         data_cursor = rc.find(FILTER)
     else:
-        data_cursor = rc.find(FILTER).skip(rc.find(FILTER).count() - 800)
+        data_cursor = rc.find(FILTER).skip(rc.find(FILTER).count() - 600)
 
     cpu_user = []
     mem_per = []
@@ -92,7 +97,7 @@ def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=5
        #json_data = json.dumps(cpu_user, default=json_util.default)
     text_title = "Resource Monitring metrics: "+str(machine)
     chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, "zoomType": zoom_type}
-    credits = { }
+    credits = {}
     if cpu_user:
         series = [
             {"name": 'cpu',
@@ -112,7 +117,7 @@ def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=5
         title = {"text": text_title}
         xAxis = {"type": 'datetime',
             "categories": [cpu_user[0][0]],
-            "tickInterval": 60
+            "tickInterval": 50
         }
         yAxis = {
             "title": {"text": 'Usage %'},
@@ -149,8 +154,8 @@ def awsInstances(machine):
     totalCost = 0
 
     matchingFlavor = getMatchingInstances(AWS_FLAVORS, machine['cpu'], ceil(float(machine['memory'])))
-
-    return render_template('matching_instances.html', data=matchingFlavor, cloudProvider =cloud)
+    matchingMachines = sorted(matchingFlavor)
+    return render_template('matching_instances.html', data=matchingMachines, cloudProvider =cloud)
 
 @app.route ('/nodecost')
 def nodecosts():
@@ -163,8 +168,8 @@ def gcpInstances(machine):
     machineList = [machine for machine in nc.find({"node":machine},{'_id': False})]
 
     matchingFlavor = getMatchingInstances(GC_FLAVORS, machine['cpu'], ceil(float(machine['memory'])))
-
-    return render_template('matching_instances.html', data=matchingFlavor, cloudProvider =cloud)
+    matchingMachines = sorted(matchingFlavor)
+    return render_template('matching_instances.html', data=matchingMachines, cloudProvider=cloud)
 
 @app.route('/nodes/<cluster>')
 def nodes(cluster):
@@ -176,12 +181,13 @@ def nodes(cluster):
     totalAWSCost = 0
     totalGCPCost = 0
     for machine in machineList:
+        #get GCP costs
         flavorGCP= getMatchingInstances(GC_FLAVORS, machine['cpu'], ceil(float(machine['memory'])))
         instanceCostGCP = gce_price(1,"regular", "us", flavorGCP[0]['name'], ceil(float(machine['disk'])), machine['os'])
         totalGCPCost += instanceCostGCP
         computedGCPCost.append(instanceCostGCP)
 
-
+        #get aws costs
         flavorAWS = getMatchingInstances(AWS_FLAVORS, machine['cpu'], ceil(float(machine['memory'])))
         instanceCostAWS = read_EC2_ondemand_instance_prices(1, "us-east-1", flavorAWS[0]['name'], machine['os'].lower())
         storageAWSCost = aws_storage_prices("us-east-1", ceil(float(machine['disk'])))

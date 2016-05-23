@@ -3,11 +3,11 @@
 {% if machine %}
 <div class="" >
   <h2>Cost Estimate of "{{machine}}" in AWS regions</h2>
-  {% if data and awsregions %}
+  {% if awsregions %}
   <table>
     <tr><td>Region</td><td>Cost Estimate per Month</td></tr>
     {% for region in  awsregions %}
-      <tr><td>{{region|upper}}</td><td>&#36;{{'%0.2f' %data[region]|float}}</td></tr>
+      <tr><td>{{region[0]|upper}}</td><td>&#36;{{'%0.2f' %region[1]|float}}</td></tr>
     {% endfor %}
 
   </table>
@@ -20,11 +20,11 @@
 {% if machine %}
 <div class="" >
   <h2>Cost Estimate of "{{machine}}" in GCP regions</h2>
-  {% if data and gcpregions %}
+  {% if gcpregions %}
   <table>
     <tr><td>Region</td><td>Cost Estimate per Month</td></tr>
     {% for region in  gcpregions %}
-      <tr><td>{{region|upper}}</td><td>&#36;{{'%0.2f' %data[region]|float}}</td></tr>
+      <tr><td>{{region[0]|upper}}</td><td>&#36;{{'%0.2f' %region[1]|float}}</td></tr>
     {% endfor %}
 
   </table>

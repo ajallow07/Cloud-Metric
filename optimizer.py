@@ -125,10 +125,3 @@ def get_cost_of_recommended_instances_on_GCP(recommendedInstances):
             recommendedInstancesAndCost.append([instance[0], instanceCost])
 
     return recommendedInstancesAndCost, totalCost
-
-if __name__ == '__main__':
-    print get_machine_resources('aj-hadoop-slave-1')
-    print get_max_resources_utilized("aj-hadoop-slave-1")
-    print get_max_resources_utilized("aj-hadoop-slave-2")
-
-    print get_matching_instance_with_PD_OS("Test")
