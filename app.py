@@ -130,10 +130,6 @@ def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=5
     return render_template('graphs.html', chartID=chartID, chart= chart, series=[], title="Resource Monitoring", xAxis={}, yAxis={})
 
 
-@app.route('/charts/show_data')
-def load_data():
-
-    return ''
 
 @app.route('/')
 def home():
@@ -156,10 +152,6 @@ def awsInstances(machine):
     matchingFlavor = getMatchingInstances(AWS_FLAVORS, machine['cpu'], ceil(float(machine['memory'])))
     matchingMachines = sorted(matchingFlavor)
     return render_template('matching_instances.html', data=matchingMachines, cloudProvider =cloud)
-
-@app.route ('/nodecost')
-def nodecosts():
-    return 'This show individual node cost'
 
 
 @app.route('/matchingGCPInstances/<machine>')
