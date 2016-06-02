@@ -3,7 +3,7 @@
 from flask import Flask,request, render_template, jsonify, session
 import config, os, math, json, datetime, optimizer
 from mapping import getMatchingInstances, AWS_FLAVORS, GC_FLAVORS
-from computeCost import gce_price, aws_storage_prices, read_EC2_ondemand_instance_prices
+from computeCost import gce_on_demand_costs, gce_price, aws_storage_prices, read_EC2_ondemand_instance_prices,aws_on_demand_costs, get_aws_instance_unit_cost, get_gcp_instance_unit_cost
 from config import NODE_COLLECTION as nc, REPORT_COLLECTION as rc, CLUSTER_COLLECTION as cc
 from jinja2 import Environment, FileSystemLoader
 from math import ceil
@@ -96,7 +96,14 @@ def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=5
         #json_cpu.append(cpu_user)
        #json_data = json.dumps(cpu_user, default=json_util.default)
     text_title = "Resource Monitring metrics: "+str(machine)
-    chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, "zoomType": zoom_type}
+    chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, "zoomType": zoom_type,
+    "backgroundColor": {
+    "linearGradient": [0, 0, 0, 500],
+            "stops": [
+                        [0, 'rgb(255, 255, 255)'],
+                        [1, 'rgb(200, 200, 255)']
+                    ]
+        }}
     credits = {}
     if cpu_user:
         series = [
@@ -216,7 +223,14 @@ def show_cluster_chart(cluster, chartID='chart_ID', chart_type='spline', chart_h
         cpu_user.append([date_str, data['avgCPU']])
 
     text_title = "Resource Monitoring metrics on "+str(session['cluster'])+ " cluster"
-    chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, "zoomType": zoom_type}
+    chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, "zoomType": zoom_type,
+    "backgroundColor": {
+    "linearGradient": [0, 0, 0, 500],
+            "stops": [
+                        [0, 'rgb(255, 255, 255)'],
+                        [1, 'rgb(200, 200, 255)']
+                    ]
+        }}
     credits = {}
 
     if cpu_user:
@@ -270,6 +284,126 @@ def recommender(cluster):
 
     return render_template('recommendation.html', aws=aws_instances,
     gcp=gcp_instances, awsData=awsCostData, gcpData=gceCostData, awstotal=totalAWSCost, gcptotal=totalGCPCost)
+
+
+
+#On-demand instance cost for daily weekly and monthly usage
+@app.route('/On_Demand_Cost/<machine>')
+def Show_On_Demand_Cost(machine, chartID='chart_ID', chart_type='spline', chart_height=500, zoom_type='xy'):
+
+    percentage_usage =[10, 25, 30, 40, 50, 60, 75, 80, 90, 100]
+    chart_data = []
+    AWS_Cost = []
+
+    specs = [node for node in nc.find({"node":machine},{'_id': False})]
+    flavorAWS = getMatchingInstances(AWS_FLAVORS, specs[0]['cpu'], ceil(float(specs[0]['memory'])))
+    flavorGCP = getMatchingInstances(GC_FLAVORS, specs[0]['cpu'], ceil(float(specs[0]['memory'])))
+
+    for percent in percentage_usage:
+        chart_data.append(gce_on_demand_costs(1,'us', flavorGCP[0]['name'],ceil(float(specs[0]['disk'])),specs[0]['os'].lower(), percent))
+        AWS_Cost.append(aws_on_demand_costs(1,'us-east-1', flavorAWS[0]['name'], ceil(float(specs[0]['disk'])) ,specs[0]['os'].lower() , percent))
+
+    GCP_Cost = chart_data
+        #json_cpu.append(cpu_user)
+       #json_data = json.dumps(cpu_user, default=json_util.default)
+    text_title = "Cost of instance per usage"
+    chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, "zoomType": zoom_type
+    ,
+    "backgroundColor": {
+     "linearGradient": [0, 0, 0, 500],
+        "stops": [
+                    [0, 'rgb(255, 255, 255)'],
+                    [1, 'rgb(200, 200, 255)']
+                ]
+    }}
+    credits = {}
+
+    if GCP_Cost and AWS_Cost:
+        series = [
+            {"name": 'AWS',
+            "type": 'spline',
+            "data": AWS_Cost
+            }, {
+            "name" : 'GCP',
+            "type": 'spline',
+            "data" : GCP_Cost
+            }
+        ]
+        title = {"text": text_title}
+        xAxis = {"type": 'category',
+            "categories": percentage_usage,
+            "tickInterval": 10,
+            "title": {"text": "Percentage of Instance Usage in a Month"}
+
+        }
+        yAxis = {
+            "title": {"text": 'Cost of Instance $'}
+            }
+
+        return render_template('costs.html', chartID=chartID, chart= chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
+        #AWS_Cost.append(GCP_Cost)
+        #json_data = json.dumps(AWS_Cost, default=json_util.default)
+        #return json_data
+#On-demand instance cost for daily weekly and monthly usage
+@app.route('/cost_variation/<machine>')
+def cost_variation(machine, chartID='chart_ID', chart_type='spline', chart_height=500, zoom_type='xy'):
+
+    percentage_usage =[10, 25, 30, 40, 50, 60, 75, 80, 90, 100]
+    GCP_Cost = []
+    AWS_Cost = []
+
+    machineList = [machine['node'] for machine in nc.find({"cluster_id":session['cluster']},{'_id':False})]
+    if machine in machineList:
+        specs = [node for node in nc.find({"node":machine},{'_id': False})]
+        flavorAWS = getMatchingInstances(AWS_FLAVORS, specs[0]['cpu'], ceil(float(specs[0]['memory'])))
+        flavorGCP = getMatchingInstances(GC_FLAVORS, specs[0]['cpu'], ceil(float(specs[0]['memory'])))
+
+        for percent in percentage_usage:
+            GCP_Cost.append(get_gcp_instance_unit_cost('us', flavorGCP[0]['name'],specs[0]['os'].lower(),percent))
+            AWS_Cost.append(get_aws_instance_unit_cost('us-east-1', flavorAWS[0]['name'],specs[0]['os'].lower(), percent))
+
+            #json_cpu.append(cpu_user)
+           #json_data = json.dumps(cpu_user, default=json_util.default)
+        text_title = "Variation in instance charges on AWS and GCP"
+        chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, "zoomType": zoom_type
+        ,
+        "backgroundColor": {
+         "linearGradient": [0, 0, 0, 500],
+            "stops": [
+                        [0, 'rgb(255, 255, 255)'],
+                        [1, 'rgb(200, 200, 255)']
+                    ]
+        }}
+        credits = {}
+
+        if GCP_Cost and AWS_Cost:
+            series = [
+                {"name": 'AWS',
+                "type": 'spline',
+                "data": AWS_Cost
+                }, {
+                "name" : 'GCP',
+                "type": 'spline',
+                "data" : GCP_Cost
+                }
+            ]
+            title = {"text": text_title}
+            xAxis = {"type": 'category',
+                "categories": percentage_usage,
+                "tickInterval": 10,
+                "title": {"text": "Percentage of Instance Usage in a Month"}
+
+            }
+            yAxis = {
+                "title": {"text": 'Charged Unit Cost in USD'}
+                }
+
+            return render_template('cost_variation.html', chartID=chartID, chart= chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
+    else:
+        return render_template('cost_variation.html', chartID=chartID, chart= chart, series=[], title=title, xAxis={}, yAxis={})
+            #AWS_Cost.append(GCP_Cost)
+            #json_data = json.dumps(machineList, default=json_util.default)
+            #return json_data
 
 if __name__ == '__main__':
 

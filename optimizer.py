@@ -14,6 +14,7 @@ def get_machine_resources(machine):
     mem = 0
     strg = 0
     opsys = ''
+    
     for resource in nc.find({"node":machine}, {"cpu":1,"memory":1, "disk":1, "os":1, "_id":0}):
         vcpu = resource['cpu']
         mem = float(resource['memory'])
