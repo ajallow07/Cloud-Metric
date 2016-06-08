@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import csv, sys, json, re
-import multiprocessing, os, re, sys, time
+import os, re, sys, time
 
 """
 In this file, we search through the Google and Amazon pricing data and gives

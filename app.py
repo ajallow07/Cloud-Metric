@@ -140,7 +140,6 @@ def show_charts(machine, chartID='chart_ID', chart_type='spline', chart_height=5
 
 @app.route('/')
 def home():
-
     cNames = []
     clusterCount = cc.count()
     if clusterCount > 0:
@@ -352,58 +351,54 @@ def cost_variation(machine, chartID='chart_ID', chart_type='spline', chart_heigh
     GCP_Cost = []
     AWS_Cost = []
 
-    machineList = [machine['node'] for machine in nc.find({"cluster_id":session['cluster']},{'_id':False})]
-    if machine in machineList:
-        specs = [node for node in nc.find({"node":machine},{'_id': False})]
-        flavorAWS = getMatchingInstances(AWS_FLAVORS, specs[0]['cpu'], ceil(float(specs[0]['memory'])))
-        flavorGCP = getMatchingInstances(GC_FLAVORS, specs[0]['cpu'], ceil(float(specs[0]['memory'])))
+    #machineList = [machine['node'] for machine in nc.find({"cluster_id":session['cluster']},{'_id':False})]
 
-        for percent in percentage_usage:
-            GCP_Cost.append(get_gcp_instance_unit_cost('us', flavorGCP[0]['name'],specs[0]['os'].lower(),percent))
-            AWS_Cost.append(get_aws_instance_unit_cost('us-east-1', flavorAWS[0]['name'],specs[0]['os'].lower(), percent))
+    specs = [node for node in nc.find({"node":machine},{'_id': False})]
+    flavorAWS = getMatchingInstances(AWS_FLAVORS, specs[0]['cpu'], ceil(float(specs[0]['memory'])))
+    flavorGCP = getMatchingInstances(GC_FLAVORS, specs[0]['cpu'], ceil(float(specs[0]['memory'])))
 
-            #json_cpu.append(cpu_user)
-           #json_data = json.dumps(cpu_user, default=json_util.default)
-        text_title = "Variation in instance charges on AWS and GCP"
-        chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, "zoomType": zoom_type
-        ,
-        "backgroundColor": {
-         "linearGradient": [0, 0, 0, 500],
-            "stops": [
-                        [0, 'rgb(255, 255, 255)'],
-                        [1, 'rgb(200, 200, 255)']
-                    ]
-        }}
-        credits = {}
+    for percent in percentage_usage:
+        GCP_Cost.append(get_gcp_instance_unit_cost('us', flavorGCP[0]['name'],specs[0]['os'].lower(),percent))
+        AWS_Cost.append(get_aws_instance_unit_cost('us-east-1', flavorAWS[0]['name'],specs[0]['os'].lower(), percent))
 
-        if GCP_Cost and AWS_Cost:
-            series = [
-                {"name": 'AWS',
-                "type": 'spline',
-                "data": AWS_Cost
-                }, {
-                "name" : 'GCP',
-                "type": 'spline',
-                "data" : GCP_Cost
-                }
-            ]
-            title = {"text": text_title}
-            xAxis = {"type": 'category',
-                "categories": percentage_usage,
-                "tickInterval": 10,
-                "title": {"text": "Percentage of Instance Usage in a Month"}
+    text_title = "Variation in instance charges on AWS and GCP"
+    chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, "zoomType": zoom_type
+    ,
+    "backgroundColor": {
+     "linearGradient": [0, 0, 0, 500],
+        "stops": [
+                    [0, 'rgb(255, 255, 255)'],
+                    [1, 'rgb(200, 200, 255)']
+                ]
+    }}
+    credits = {}
 
+    if GCP_Cost and AWS_Cost:
+        series = [
+            {"name": 'AWS',
+            "type": 'spline',
+            "data": AWS_Cost
+            }, {
+            "name" : 'GCP',
+            "type": 'spline',
+            "data" : GCP_Cost
             }
-            yAxis = {
-                "title": {"text": 'Charged Unit Cost in USD'}
-                }
+        ]
+        title = {"text": text_title}
+        xAxis = {"type": 'category',
+            "categories": percentage_usage,
+            "tickInterval": 10,
+            "title": {"text": "Percentage of Instance Usage in a Month"}
 
-            return render_template('cost_variation.html', chartID=chartID, chart= chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
-    else:
-        return render_template('cost_variation.html', chartID=chartID, chart= chart, series=[], title=title, xAxis={}, yAxis={})
-            #AWS_Cost.append(GCP_Cost)
-            #json_data = json.dumps(machineList, default=json_util.default)
-            #return json_data
+        }
+        yAxis = {
+            "title": {"text": 'Charged Unit Cost in USD'}
+            }
+
+        return render_template('cost_variation.html', chartID=chartID, chart= chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
+        #AWS_Cost.append(GCP_Cost)
+        #json_data = json.dumps(AWS_Cost, default=json_util.default)
+        #return json_data
 
 if __name__ == '__main__':
 
