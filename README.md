@@ -89,7 +89,7 @@ Go to your browser and type in `http://[your container IP]:5000`, you should see
 Now you got cloud metric running the app and mongodb in a single docker container :clap: :clap: :clap:
 
 
-**External Mining and Monitoring files**
+####Step 4: **External Mining and Monitoring files**
 
 To register you environment on cloud metric app, you need to run:
 
