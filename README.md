@@ -84,7 +84,10 @@ Start the application by
 
 `sudo docker-compose up`
 
+Go to your browser and type in `http://[your container IP]:5000`, you should see the application interface!
+
 Now you got cloud metric running the app and mongodb in a single docker container :clap: :clap: :clap:
+
 
 **External Mining and Monitoring files**
 
@@ -100,7 +103,17 @@ and [psutil](https://pypi.python.org/pypi/psutil) by using the following command
 
 `sudo apt-get install python-pymongo`
 
-'sudo apt-get install python-pstutil'
+`sudo apt-get install python-psutil`
+
+Once installation is done you simply run the `resource_miner.py` once by typing:
+
+`python resource_miner.py [IP of your mongoDB] [Your Cluster Name]`
+
+and run `monitor.py` as a process by typing:
+
+`python monitor.py [IP of your monogDB] [Your Cluster Name]`
+
+Congratulations! You've got your environment monitored and meter by Cloud Metric :clap::clap::clap:
 
 
 
