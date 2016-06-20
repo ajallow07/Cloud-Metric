@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+  #!/usr/bin/env python
 import csv, os
 import sys
 import json
@@ -241,8 +241,10 @@ def gce_on_demand_costs(instances, zone, machine_type, storage_size, ops, usage_
 	On_demand_usage_cost.append(total_on_demand_cost)
 
 	return On_demand_usage_cost
-
+	
+'''
 if __name__ == '__main__':
 
 	print get_aws_instance_unit_cost('us-east-1', 'm3.large','linux', 100)
 	print get_gcp_instance_unit_cost('us', 'N1-STANDARD-1','linux', 35)
+'''

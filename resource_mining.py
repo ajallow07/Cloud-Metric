@@ -73,14 +73,11 @@ def detect_ncpus():
         #return the default value
         return 1
 
-def insert_data():
+def insert_data(ip, clustername):
 
-    if len(sys.argv) < 2:
-        print "Error, Usage: python resource_mining.py [MongoDB IP]"
-        sys.exit()
 
     try:
-        CLUSTER_KEY = 'Hadoop'
+    
         CM_DB = 'Node_Data'
         db = MongoClient(sys.argv[1], 27017)[CM_DB]
         '''
@@ -92,7 +89,7 @@ def insert_data():
         #checks if cluster_key was inserted
         if CLUSTER_KEY not in [node['name'] for node in db.clusters.find({},{'_id':0,'name':1})]:
             cluster_doc = dict()
-            cluster_doc['name'] = CLUSTER_KEY
+            cluster_doc['name'] = clustername
             db.clusters.insert(cluster_doc)
             db.clusters.create_index('name',unique=True)
         '''
@@ -130,4 +127,8 @@ def insert_data():
 
 
 if __name__=='__main__':
-    insert_data()
+    if len(sys.argv) < 3:
+        print "Error, Usage: python resource_mining.py [MongoDB IP] [Cluster Name]"
+        sys.exit()
+
+    insert_data(sys.argv[1], sys.argv[2])

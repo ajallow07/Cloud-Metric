@@ -207,21 +207,6 @@ def show_cluster_chart(cluster, chartID='chart_ID', chart_type='spline', chart_h
 
     data_cursor = rc.aggregate(AGGR)
 
-    cpu_user = []
-    mem_per = []
-    disk_usage = []
-    json_data = []
-    for data in data_cursor:
-        #json_data.append(data)
-        #if data['node'] == machine:
-
-        date_form = datetime.datetime.strptime(data['_id'], "%Y-%m-%d %H:%M")
-        date_str = date_form.strftime('%b %d, %H:%M')
-        disk_usage.append([date_str, data['avgDisk']])
-        mem_per.append([date_str, data['avgMemory']])
-        cpu_user.append([date_str, data['avgCPU']])
-
-    text_title = "Resource Monitoring metrics on "+str(session['cluster'])+ " cluster"
     chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, "zoomType": zoom_type,
     "backgroundColor": {
     "linearGradient": [0, 0, 0, 500],
@@ -232,34 +217,49 @@ def show_cluster_chart(cluster, chartID='chart_ID', chart_type='spline', chart_h
         }}
     credits = {}
 
-    if cpu_user:
-        series = [
-            {"name": 'cpu',
-            "type": 'spline',
-            "data": cpu_user
-            }, {
-                "name" : 'memory',
+    if data_cursor:
+        cpu_user = []
+        mem_per = []
+        disk_usage = []
+        json_data = []
+        for data in data_cursor:
+            #json_data.append(data)
+            #if data['node'] == machine:
+
+            date_form = datetime.datetime.strptime(data['_id'], "%Y-%m-%d %H:%M")
+            date_str = date_form.strftime('%b %d, %H:%M')
+            disk_usage.append([date_str, data['avgDisk']])
+            mem_per.append([date_str, data['avgMemory']])
+            cpu_user.append([date_str, data['avgCPU']])
+
+        text_title = "Resource Monitoring metrics on "+str(session['cluster'])+ " cluster"
+        if cpu_user:
+            series = [
+                {"name": 'cpu',
                 "type": 'spline',
-                "data" :  mem_per
-            },
-            {
-                "name": 'disk',
-                "type": 'spline',
-                "data": disk_usage
+                "data": cpu_user
+                }, {
+                    "name" : 'memory',
+                    "type": 'spline',
+                    "data" :  mem_per
+                },
+                {
+                    "name": 'disk',
+                    "type": 'spline',
+                    "data": disk_usage
+                }
+            ]
+            title = {"text": text_title}
+            xAxis = {"type": 'datetime',
+                "categories": [cpu_user[0][0]],
+                "tickInterval": 60
             }
-        ]
-        title = {"text": text_title}
-        xAxis = {"type": 'datetime',
-            "categories": [cpu_user[0][0]],
-            "tickInterval": 60
-        }
-        yAxis = {"title": {"text": 'Utilization %'},
-        "ceiling": 100,
-        "floor": 0
-        }
-
-        return render_template('cluster_monitor.html', chartID=chartID, chart= chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
-
+            yAxis = {"title": {"text": 'Utilization %'},
+            "ceiling": 100,
+            "floor": 0
+            }
+            return render_template('cluster_monitor.html', chartID=chartID, chart=chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
+        return render_template('cluster_monitor.html', chartID=chartID, chart=chart, series=[], title="Resource Monitoring", xAxis={}, yAxis={})
     return render_template('cluster_monitor.html', chartID=chartID, chart=chart, series=[], title="Resource Monitoring", xAxis={}, yAxis={})
 
 @app.route('/recommender/<cluster>')
@@ -374,6 +374,7 @@ def cost_variation(machine, chartID='chart_ID', chart_type='spline', chart_heigh
     credits = {}
 
     if GCP_Cost and AWS_Cost:
+
         series = [
             {"name": 'AWS',
             "type": 'spline',
@@ -384,7 +385,7 @@ def cost_variation(machine, chartID='chart_ID', chart_type='spline', chart_heigh
             "data" : GCP_Cost
             }
         ]
-        title = {"text": text_title}
+        title = { "text": text_title }
         xAxis = {"type": 'category',
             "categories": percentage_usage,
             "tickInterval": 10,

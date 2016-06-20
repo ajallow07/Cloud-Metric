@@ -19,16 +19,14 @@ var_disk = psutil.disk_usage(first_mnt).percent
 
 """
 
-def send_resource_utilization(ip):
-
-    CLUSTER_KEY = 'Hadoop' #provide the cluster_key
+def send_resource_utilization(ip, clustername):
 
     cpu = psutil.cpu_times_percent()
     disk_root = psutil.disk_usage('/')
     phymem = psutil.virtual_memory()
 
     doc = dict()
-    doc['cluster_id'] = CLUSTER_KEY
+    doc['cluster_id'] = clustername
     doc['node'] = socket.gethostname()
     doc['dt'] = datetime.now()
     doc['disk'] = disk_root.percent
@@ -54,10 +52,10 @@ def send_resource_utilization(ip):
 
 if __name__ == '__main__':
 
-    if len(sys.argv) < 2:
-        print "Error, Usage: python monitoring.py [MongoDB IP] &"
+    if len(sys.argv) < 3:
+        print "Error, Usage: python monitoring.py [MongoDB IP] [Cluster Name] &"
         sys.exit()
 
     while True:
-        main(sys.argv[1])
+        send_resource_utilization(sys.argv[1], sys.argv[2])
         time.sleep(60) # pause for 60 seconds
