@@ -10,7 +10,7 @@
     {% if clusterNames %}
     <ul>
       {% for node in clusterNames %}
-      <li><strong><a href="{{url_for('nodes',cluster=node)}}">cluster {{loop.index}}</a></strong></li>
+      <li><strong><a href="{{url_for('nodes',cluster=node)}}">{{node}}</a></strong></li>
       {% endfor %}
     </ul>
     {% endif %}

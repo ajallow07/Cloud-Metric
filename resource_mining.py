@@ -77,7 +77,7 @@ def insert_data(ip, clustername):
 
 
     try:
-    
+
         CM_DB = 'Node_Data'
         db = MongoClient(sys.argv[1], 27017)[CM_DB]
         '''
@@ -87,7 +87,7 @@ def insert_data(ip, clustername):
                            capped=False)
         '''
         #checks if cluster_key was inserted
-        if CLUSTER_KEY not in [node['name'] for node in db.clusters.find({},{'_id':0,'name':1})]:
+        if clustername not in [node['name'] for node in db.clusters.find({},{'_id':0,'name':1})]:
             cluster_doc = dict()
             cluster_doc['name'] = clustername
             db.clusters.insert(cluster_doc)
@@ -105,7 +105,7 @@ def insert_data(ip, clustername):
         #DISK_SIZE = get_block_storage()
         #vCPU_COUNT = detect_ncpus()
         doc = dict()
-        doc['cluster_id'] = CLUSTER_KEY
+        doc['cluster_id'] = clustername
         doc['node'] = socket.gethostname()
         doc['os'] = platform.system()
         doc['cpu'] = detect_ncpus()
