@@ -53,7 +53,7 @@ def get_block_storage():
         disk_size = bytes_to_human(usage.total)
     return disk_size
 
-def get_ncpus():
+def detect_ncpus():
         """Detects the number of effective CPUs in the system"""
         #for Linux, Unix and MacOS
         if hasattr(os, "sysconf"):
@@ -111,7 +111,7 @@ def insert_data():
         doc['cluster_id'] = CLUSTER_KEY
         doc['node'] = socket.gethostname()
         doc['os'] = platform.system()
-        doc['cpu'] = get_ncpus()
+        doc['cpu'] = detect_ncpus()
         doc['memory'] = get_total_memory(psutil.virtual_memory())
         doc['disk'] = get_block_storage()
 

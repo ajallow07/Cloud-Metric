@@ -19,7 +19,7 @@ var_disk = psutil.disk_usage(first_mnt).percent
 
 """
 
-def main(ip):
+def send_resource_utilization(ip):
 
     CLUSTER_KEY = 'Hadoop' #provide the cluster_key
 
