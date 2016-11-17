@@ -107,11 +107,11 @@ and [psutil](https://pypi.python.org/pypi/psutil) by using the following command
 
 Once installation is done you simply run the `resource_miner.py` once by typing:
 
-`python resource_miner.py [IP of your mongoDB] [Your Cluster Name]`
+`python resource_mining.py [IP of your mongoDB] [Your Cluster Name]`
 
-and run `monitor.py` as a process by typing:
+and run `monitoring.py` as a process by typing:
 
-`python monitor.py [IP of your monogDB] [Your Cluster Name]`
+`python monitoring.py [IP of your monogDB] [Your Cluster Name]`
 
 Congratulations! You've got your environment monitored and meter by Cloud Metric :clap::clap::clap:
 
