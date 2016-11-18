@@ -1,19 +1,34 @@
-{% extends "index.html" %}
-{% block content %}
-  <div class="jumbo">
-
-    <h2>Welcome to CLOUD-METRIC!</h2>
-    {% if clusterNumber > 0 %}
-    <h3>You have registered <b>{{clusterNumber}}</b> cluster(s)</h3>
-    {% endif %}
-
-    {% if clusterNames %}
-    <ul>
-      {% for node in clusterNames %}
-      <li><strong><a href="{{url_for('nodes',cluster=node)}}">{{node}}</a></strong></li>
-      {% endfor %}
-    </ul>
-    {% endif %}
-  </div>
-
-{% endblock %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="1404.47">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 14.0px; font: 12.0px Times; color: #000000; -webkit-text-stroke: #000000}
+    li.li1 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 14.0px; font: 12.0px Times; color: #000000; -webkit-text-stroke: #000000}
+    li.li4 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 14.0px; font: 12.0px Times; color: #0000ee; -webkit-text-stroke: #0000ee}
+    span.s1 {font-kerning: none}
+    span.s2 {-webkit-text-stroke: 0px #000000}
+    span.s3 {text-decoration: underline ; font-kerning: none; color: #0000ee}
+    span.s4 {text-decoration: underline ; font-kerning: none}
+    ul.ul1 {list-style-type: disc}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="s1">{% extends "index.html" %} {% block content %}</span></p>
+<h2 style="margin: 0.0px 0.0px 14.9px 0.0px; line-height: 22.0px; font: 18.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Welcome to CLOUD-METRIC!</b></span></h2>
+<p class="p1"><span class="s1">{% if clusterNumber &gt; 0 %}</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>You have registered {{clusterNumber}} cluster(s)</b></span></h3>
+<p class="p1"><span class="s1">{% endif %} {% if clusterNames %}</span></p>
+<ul class="ul1">
+  <li class="li1"><span class="s2"></span><span class="s1">{% for node in clusterNames %}</span></li>
+  <li class="li4"><span class="s2"><b></b><a href="file:///Users/andreash/github/cloud-metric/templates/%7B%7Burl_for('nodes',cluster=node)%7D%7D"><span class="s3"><b>{{node}}</b></span></a></span><span class="s4"><b>&lt;br/&gt;</b></span></li>
+  <li class="li1"><span class="s2"></span><span class="s1">{% endfor %}<span class="Apple-converted-space"> </span></span></li>
+</ul>
+<p class="p1"><span class="s1">{% endif %}<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1">{% endblock %}<span class="Apple-converted-space"> </span></span></p>
+</body>
+</html>
