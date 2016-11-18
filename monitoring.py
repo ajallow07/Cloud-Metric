@@ -62,4 +62,4 @@ if __name__ == '__main__':
         except:
             monitoring_interval = 60
         send_resource_utilization(sys.argv[1], sys.argv[2])
-        time.sleep(monitoring_interval) 
+        time.sleep(float(monitoring_interval)) 
