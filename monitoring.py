@@ -52,10 +52,14 @@ def send_resource_utilization(ip, clustername):
 
 if __name__ == '__main__':
 
-    if len(sys.argv) < 3:
+    if len(sys.argv) < :
         print "Error, Usage: python monitoring.py [MongoDB IP] [Cluster Name] &"
         sys.exit()
 
     while True:
+        try:
+            monitoring_interval = sys.argv[3]
+        except:
+            monitoring_interval = 60
         send_resource_utilization(sys.argv[1], sys.argv[2])
-        time.sleep(60) # pause for 60 seconds
+        time.sleep(monitoring_interval) 
