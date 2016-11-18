@@ -52,7 +52,7 @@ def send_resource_utilization(ip, clustername):
 
 if __name__ == '__main__':
 
-    if len(sys.argv) < :
+    if len(sys.argv) < 3:
         print "Error, Usage: python monitoring.py [MongoDB IP] [Cluster Name] &"
         sys.exit()
 
