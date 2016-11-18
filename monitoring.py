@@ -57,5 +57,9 @@ if __name__ == '__main__':
         sys.exit()
 
     while True:
+        try:
+            monitoring_interval = sys.argv[3]
+        except:
+            monitoring_interval = 60
         send_resource_utilization(sys.argv[1], sys.argv[2])
-        time.sleep(60) # pause for 60 seconds
+        time.sleep(float(monitoring_interval)) 
