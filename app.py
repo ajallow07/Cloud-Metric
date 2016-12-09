@@ -201,7 +201,7 @@ def nodes(cluster):
 def show_cluster_chart(cluster, chartID='chart_ID', chart_type='spline', chart_height=500, zoom_type='xy'):
 
     AGGR = [{ "$match": { "cluster_id": cluster }},
-    {"$group" : { "_id": { "$dateToString": { "format": "%Y-%m-%d %H:00", "date": "$dt" }},
+    {"$group" : { "_id": { "$dateToString": { "format": "%Y-%m-%d %H:%M:%S", "date": "$dt" }},
     "avgCPU": {"$avg": "$cpu.user"}, "avgMemory" :{ "$avg": "$memory"}, "avgDisk": {"$avg": "$disk"}}},
     {"$sort": {"_id": 1}}]
 
@@ -226,25 +226,25 @@ def show_cluster_chart(cluster, chartID='chart_ID', chart_type='spline', chart_h
             #json_data.append(data)
             #if data['node'] == machine:
 
-            date_form = datetime.datetime.strptime(data['_id'], "%Y-%m-%d %H:%M")
-            date_str = date_form.strftime('%b %d, %H:%M')
+            date_form = datetime.datetime.strptime(data['_id'], "%Y-%m-%d %H:%M:%S")
+            date_str = date_form.strftime('%b %d, %H:%M:%S')
             disk_usage.append([date_str, data['avgDisk']])
             mem_per.append([date_str, data['avgMemory']])
             cpu_user.append([date_str, data['avgCPU']])
 
-        text_title = "Resource Monitoring metrics on "+str(session['cluster'])+ " cluster"
+        text_title = "Aggregated resource usage for cluster "+str(session['cluster'])+ " cluster"
         if cpu_user:
             series = [
-                {"name": 'cpu',
+                {"name": 'CPU',
                 "type": 'spline',
                 "data": cpu_user
                 }, {
-                    "name" : 'memory',
+                    "name" : 'Memory',
                     "type": 'spline',
                     "data" :  mem_per
                 },
                 {
-                    "name": 'disk',
+                    "name": 'Disk',
                     "type": 'spline',
                     "data": disk_usage
                 }
@@ -254,7 +254,7 @@ def show_cluster_chart(cluster, chartID='chart_ID', chart_type='spline', chart_h
                 "categories": [cpu_user[0][0]],
                 "tickInterval": 60
             }
-            yAxis = {"title": {"text": 'Utilization %'},
+            yAxis = {"title": {"text": 'Utilization (%)'},
             "ceiling": 100,
             "floor": 0
             }
