@@ -201,7 +201,7 @@ def nodes(cluster):
 def show_cluster_chart(cluster, chartID='chart_ID', chart_type='spline', chart_height=500, zoom_type='xy'):
 
     AGGR = [{ "$match": { "cluster_id": cluster }},
-    {"$group" : { "_id": { "$dateToString": { "format": "%Y-%m-%d %H:%M:%s", "date": "$dt" }},
+    {"$group" : { "_id": { "$dateToString": { "format": "%Y-%m-%d %H:%M:%S", "date": "$dt" }},
     "avgCPU": {"$avg": "$cpu.user"}, "avgMemory" :{ "$avg": "$memory"}, "avgDisk": {"$avg": "$disk"}}},
     {"$sort": {"_id": 1}}]
 
